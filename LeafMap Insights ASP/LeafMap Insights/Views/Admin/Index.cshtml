@@ -1,0 +1,92 @@
+@using LeafMap_Insights.Models.ViewModels
+@model AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Админ панел";
+}
+
+<div class="container-fluid fade-in">
+    <div class="page-header">
+        <div>
+            <h1><span>⚙️</span> Админ панел</h1>
+            <p class="lead">Управление на дървета, таксономия и потребители</p>
+        </div>
+    </div>
+
+    @if (Model != null)
+    {
+        <div class="row mt-4 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h3>@Model.TotalTrees</h3>
+                    <p>Дървета</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <h3>@Model.TotalSpecies</h3>
+                    <p>Видове</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <h3>@Model.TotalUsers</h3>
+                    <p>Потребители</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <h3>@Model.TotalFamilies</h3>
+                    <p>Семейства</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <span class="icon-large">🌲</span>
+                    <h5 class="card-title">Управление на дървета</h5>
+                    <p class="card-text">Управление на дървета, местоположения и QR кодове</p>
+                    <a asp-action="Trees" class="btn btn-primary btn-lg">
+                        <span>➡️</span> Управление на дървета
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <span class="icon-large">📚</span>
+                    <h5 class="card-title">Управление на таксономия</h5>
+                    <p class="card-text">Управление на Семейства, Родове и Видове</p>
+                    <div class="d-grid gap-2">
+                        <a asp-action="Families" class="btn btn-outline-primary">
+                            <span>👥</span> Семейства
+                        </a>
+                        <a asp-action="Genera" class="btn btn-outline-primary">
+                            <span>🔬</span> Родове
+                        </a>
+                        <a asp-action="Species" class="btn btn-outline-primary">
+                            <span>🌿</span> Видове
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <span class="icon-large">👤</span>
+                    <h5 class="card-title">Управление на потребители</h5>
+                    <p class="card-text">Управление на потребители и роли</p>
+                    <a asp-action="Users" class="btn btn-primary btn-lg">
+                        <span>➡️</span> Управление на потребители
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

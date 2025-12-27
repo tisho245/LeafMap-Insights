@@ -1,0 +1,59 @@
+@model LeafMap_Insights.Models.ViewModels.UserViewModel
+
+@{
+    ViewData["Title"] = "Изтриване на потребител";
+}
+
+<div class="container-fluid fade-in">
+    <div class="page-header">
+        <div>
+            <h1><span>🗑️</span> Изтриване на потребител</h1>
+            <p class="lead">Сигурни ли сте, че искате да изтриете този потребител?</p>
+        </div>
+    </div>
+
+    <div class="alert alert-warning">
+        <strong>⚠️ Внимание:</strong> Това действие не може да бъде отменено. Потребителят ще бъде перманентно изтрит от системата.
+    </div>
+
+    <div>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">Имейл:</dt>
+            <dd class="col-sm-10">@Model.Email</dd>
+
+            <dt class="col-sm-2">Потребителско име:</dt>
+            <dd class="col-sm-10">@Model.UserName</dd>
+
+            <dt class="col-sm-2">Имейл потвърден:</dt>
+            <dd class="col-sm-10">
+                @if (Model.EmailConfirmed)
+                {
+                    <span class="badge bg-success">Да</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning">Не</span>
+                }
+            </dd>
+
+            <dt class="col-sm-2">Роли:</dt>
+            <dd class="col-sm-10">
+                @foreach (var role in Model.Roles)
+                {
+                    <span class="badge bg-primary me-1">@role</span>
+                }
+                @if (!Model.Roles.Any())
+                {
+                    <span class="text-muted">Няма роли</span>
+                }
+            </dd>
+        </dl>
+
+        <form asp-action="DeleteUser" class="mt-4">
+            <input type="hidden" asp-for="Id" />
+            <input type="submit" value="Изтрий потребител" class="btn btn-danger btn-lg" />
+            <a asp-action="Users" class="btn btn-secondary btn-lg">Отказ</a>
+        </form>
+    </div>
+</div>

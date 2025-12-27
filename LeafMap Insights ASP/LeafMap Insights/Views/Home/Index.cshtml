@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Начало - LeafMap Insights";
+}
+
+<div class="container-fluid fade-in">
+    <div class="text-center mb-5">
+        <div class="page-header">
+            <h1 class="display-4 mb-3">Добре дошли в LeafMap Insights</h1>
+            <p class="lead mb-0">Откривайте и управлявайте данни за таксономия на дървета с географска визуализация</p>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center d-flex flex-column">
+                    <span class="icon-large">🌳</span>
+                    <h4 class="card-title">Разглеждане на дървета</h4>
+                    <p class="card-text flex-grow-1">Разгледайте нашата колекция от дървета с подробна информация, таксономия и характеристики</p>
+                    <a asp-controller="Trees" asp-action="Index" class="btn btn-primary btn-lg mt-auto">
+                        <span>➡️</span> Виж дърветата
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center d-flex flex-column">
+                    <span class="icon-large">🗺️</span>
+                    <h4 class="card-title">Изглед на карта</h4>
+                    <p class="card-text flex-grow-1">Визуализирайте местоположенията на дърветата на интерактивна карта с подробни изскачащи прозорци и навигация</p>
+                    <a asp-controller="Trees" asp-action="Map" class="btn btn-primary btn-lg mt-auto">
+                        <span>➡️</span> Виж картата
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center d-flex flex-column">
+                    <span class="icon-large">📱</span>
+                    <h4 class="card-title">Мобилно API</h4>
+                    <p class="card-text flex-grow-1">Достъп до данни за дървета чрез REST API крайни точки, проектирани за .NET MAUI мобилни приложения</p>
+                    <a href="/api/TreesApi" class="btn btn-primary btn-lg mt-auto">
+                        <span>➡️</span> Виж API
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><span>✨</span> Функции</h5>
+                    <div class="row">
+                        <div class="col-md-3 text-center mb-3">
+                            <strong>🌿 Таксономия</strong><br>
+                            <small class="text-muted">Семейство, Род, Вид</small>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <strong>📍 GPS местоположение</strong><br>
+                            <small class="text-muted">Точни координати</small>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <strong>📱 QR кодове</strong><br>
+                            <small class="text-muted">Бърз достъп чрез QR</small>
+                        </div>
+                        <div class="col-md-3 text-center mb-3">
+                            <strong>🔐 Достъп на база роли</strong><br>
+                            <small class="text-muted">Роли Администратор и Потребител</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

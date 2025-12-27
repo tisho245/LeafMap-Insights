@@ -1,0 +1,63 @@
+@model IEnumerable<LeafMap_Insights.Models.Species>
+
+@{
+    ViewData["Title"] = "Manage Species";
+}
+
+<div class="container-fluid fade-in">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><span>🌿</span> Управление на видове</h1>
+                <p class="lead">Управление на видове дървета</p>
+            </div>
+            <a asp-action="CreateSpecies" class="btn btn-light btn-lg">
+                <span>➕</span> Добави нов вид
+            </a>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Име</th>
+                        <th>Латинско име</th>
+                        <th>Род</th>
+                        <th>Семейство</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.Name</td>
+                            <td><em>@item.LatinName</em></td>
+                            <td><em>@item.Genus?.LatinName</em></td>
+                            <td>@item.Genus?.Family?.Name</td>
+                            <td>
+                                <a asp-action="EditSpecies" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
+                                    <span>✏️</span> Редактирай
+                                </a>
+                                <a asp-action="DeleteSpecies" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
+                                    <span>🗑️</span> Изтрий
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            Няма намерени видове. <a asp-action="CreateSpecies" class="alert-link">Създайте първия вид</a>
+        </div>
+    }
+</div>

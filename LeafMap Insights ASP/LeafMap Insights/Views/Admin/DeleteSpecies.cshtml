@@ -1,0 +1,47 @@
+@model LeafMap_Insights.Models.Species
+
+@{
+    ViewData["Title"] = "Изтриване на вид";
+}
+
+<div class="container-fluid fade-in">
+    <div class="page-header">
+        <div>
+            <h1><span>🗑️</span> Изтриване на вид</h1>
+            <p class="lead">Сигурни ли сте, че искате да изтриете този вид?</p>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">Име:</dt>
+            <dd class="col-sm-10">@Model.Name</dd>
+
+            <dt class="col-sm-2">Латинско име:</dt>
+            <dd class="col-sm-10"><em>@Model.LatinName</em></dd>
+
+            <dt class="col-sm-2">Род:</dt>
+            <dd class="col-sm-10"><em>@Model.Genus?.LatinName</em></dd>
+
+            <dt class="col-sm-2">Семейство:</dt>
+            <dd class="col-sm-10">@Model.Genus?.Family?.Name</dd>
+
+            <dt class="col-sm-2">Описание:</dt>
+            <dd class="col-sm-10">@(Model.Description ?? "Н/Д")</dd>
+        </dl>
+
+        <form asp-action="DeleteSpecies" class="mt-4">
+            <input type="hidden" asp-for="Id" />
+            <input type="submit" value="Изтрий" class="btn btn-danger btn-lg" />
+            <a asp-action="Species" class="btn btn-secondary btn-lg">Отказ</a>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,61 @@
+@model IEnumerable<LeafMap_Insights.Models.Family>
+
+@{
+    ViewData["Title"] = "Manage Families";
+}
+
+<div class="container-fluid fade-in">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><span>👥</span> Управление на семейства</h1>
+                <p class="lead">Управление на ботанически семейства</p>
+            </div>
+            <a asp-action="CreateFamily" class="btn btn-light btn-lg">
+                <span>➕</span> Добави ново семейство
+            </a>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Име</th>
+                        <th>Описание</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td><strong>@item.Name</strong></td>
+                            <td>@(item.Description ?? "-")</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="EditFamily" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
+                                        <span>✏️</span> Редактирай
+                                    </a>
+                                    <a asp-action="DeleteFamily" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
+                                        <span>🗑️</span> Изтрий
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            Няма намерени семейства. <a asp-action="CreateFamily" class="alert-link">Създайте първото семейство</a>
+        </div>
+    }
+</div>

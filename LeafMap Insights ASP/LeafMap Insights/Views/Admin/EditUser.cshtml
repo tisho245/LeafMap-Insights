@@ -1,0 +1,65 @@
+@model LeafMap_Insights.Models.ViewModels.UserEditViewModel
+
+@{
+    ViewData["Title"] = "Редактиране на потребител";
+}
+
+<div class="container-fluid fade-in">
+    <div class="page-header">
+        <div>
+            <h1><span>✏️</span> Редактиране на потребител</h1>
+            <p class="lead">Актуализиране на информация за потребителя</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <form asp-action="EditUser">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group mb-3">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="UserName" class="control-label"></label>
+                    <input asp-for="UserName" class="form-control" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" asp-for="EmailConfirmed" />
+                    <label class="form-check-label" asp-for="EmailConfirmed"></label>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="control-label">Роли</label>
+                    <div class="border p-3 rounded">
+                        @foreach (var role in Model.AvailableRoles)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="SelectedRoles" value="@role" 
+                                       id="role_@role" @(Model.SelectedRoles?.Contains(role) == true ? "checked" : "") />
+                                <label class="form-check-label" for="role_@role">
+                                    @role
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="form-group mt-4">
+                    <input type="submit" value="Запази промените" class="btn btn-primary btn-lg" />
+                    <a asp-action="Users" class="btn btn-secondary btn-lg">Отказ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

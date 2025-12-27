@@ -1,0 +1,51 @@
+@model LeafMap_Insights.Models.Tree
+
+@{
+    ViewData["Title"] = "Delete Tree";
+}
+
+<div class="container-fluid fade-in">
+    <div class="page-header">
+        <div>
+            <h1><span>🗑️</span> Изтриване на дърво</h1>
+            <p class="lead">Сигурни ли сте, че искате да изтриете това дърво?</p>
+        </div>
+    </div>
+
+    <div class="alert alert-warning">
+        <strong>⚠️ Внимание:</strong> Това действие не може да бъде отменено. Дървото и всички свързани данни ще бъдат перманентно изтрити.
+    </div>
+
+    <div>
+    <dl class="row">
+        <dt class="col-sm-2">ID:</dt>
+        <dd class="col-sm-10">@Model.Id</dd>
+
+        <dt class="col-sm-2">Вид:</dt>
+        <dd class="col-sm-10">
+            @Model.Species?.Name<br />
+            <em>@Model.Species?.LatinName</em>
+        </dd>
+
+        <dt class="col-sm-2">Местоположение:</dt>
+        <dd class="col-sm-10">
+            @Model.Latitude.ToString("F6"), @Model.Longitude.ToString("F6")
+        </dd>
+
+        <dt class="col-sm-2">Приблизителна възраст:</dt>
+        <dd class="col-sm-10">@(Model.EstimatedAge.HasValue ? Model.EstimatedAge.Value + " години" : "Неизвестна")</dd>
+
+        <dt class="col-sm-2">Височина:</dt>
+        <dd class="col-sm-10">@(Model.Height.HasValue ? Model.Height.Value.ToString("F2") + " метра" : "Неизвестна")</dd>
+
+        <dt class="col-sm-2">Състояние:</dt>
+        <dd class="col-sm-10">@(Model.Condition ?? "Н/Д")</dd>
+    </dl>
+
+    <form asp-action="DeleteTree" class="mt-4">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Изтрий дърво" class="btn btn-danger btn-lg" />
+        <a asp-action="Trees" class="btn btn-secondary btn-lg">Отказ</a>
+    </form>
+    </div>
+</div>

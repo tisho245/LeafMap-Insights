@@ -1,0 +1,182 @@
+@model IEnumerable<LeafMap_Insights.Models.Tree>
+
+@{
+    ViewData["Title"] = "Карта на дърветата";
+}
+
+<div class="container-fluid fade-in">
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><span>🗺️</span> Карта на дърветата</h1>
+                <p class="lead">Интерактивна карта, показваща местоположенията на всички дървета</p>
+            </div>
+            <a asp-action="Index" class="btn btn-light btn-lg">
+                <span>←</span> Назад към списъка
+            </a>
+        </div>
+    </div>
+
+    <div id="map" style="height: 650px; width: 100%;"></div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <script>
+        // Initialize map - Центрирана на училище "Генерал Владимир Заимов", бул. Иван Вазов 1, Сопот
+        var map = L.map('map').setView([42.655997269349136, 24.74597442565678], 14);
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // School location coordinates
+        var schoolLat = 42.655997269349136;
+        var schoolLng = 24.74597442565678;
+
+        // Create custom icon for school - minimalistic building icon
+        var schoolIconSvg = `
+            <svg width="28" height="32" viewBox="0 0 28 32" xmlns="http://www.w3.org/2000/svg">
+                <!-- Building -->
+                <rect x="4" y="10" width="20" height="20" fill="#DC3545" rx="2"/>
+                <!-- Roof -->
+                <path d="M 2 10 L 14 4 L 26 10 Z" fill="#C82333"/>
+                <!-- Windows -->
+                <rect x="8" y="16" width="4" height="4" fill="#FFF"/>
+                <rect x="16" y="16" width="4" height="4" fill="#FFF"/>
+                <rect x="8" y="22" width="4" height="4" fill="#FFF"/>
+                <rect x="16" y="22" width="4" height="4" fill="#FFF"/>
+            </svg>
+        `;
+
+        var schoolIcon = L.divIcon({
+            html: schoolIconSvg,
+            className: 'custom-school-icon',
+            iconSize: [28, 32],
+            iconAnchor: [14, 32],
+            popupAnchor: [0, -32]
+        });
+
+        // Add marker for school location with custom icon
+        var schoolMarker = L.marker([schoolLat, schoolLng], { icon: schoolIcon })
+            .addTo(map)
+            .bindPopup('<div style="min-width: 200px;"><h6><strong>🏫 ПГ "Генерал Владимир Заимов"</strong></h6><p>бул. Иван Вазов 1<br>4330 Сопот</p></div>');
+
+        // Tree markers - сериализираме всички дървета
+        var trees = @Html.Raw(Json.Serialize(Model != null ? Model.Select(t => new {
+            id = t.Id,
+            lat = t.Latitude,
+            lng = t.Longitude,
+            species = t.Species?.Name ?? "Неизвестен вид",
+            latinName = t.Species?.LatinName ?? "",
+            genusName = t.Species?.Genus?.LatinName ?? "",
+            familyName = t.Species?.Genus?.Family?.Name ?? "",
+            age = t.EstimatedAge,
+            height = t.Height,
+            condition = t.Condition
+        }).ToList() : new List<object>()));
+
+        // Проверяваме дали има валидни данни
+        if (!trees) {
+            trees = [];
+        }
+
+        // Function to get tree icon based on genus/family
+        function getTreeIcon(genusName, familyName) {
+            // Define colors for different families (leaves/crown colors)
+            var colors = {
+                'Букови': '#2E7D32',      // Dark green для дъб, бук
+                'Розови': '#FFB74D',      // Orange для ябълка, круша (плодове)
+                'Борови': '#1B5E20',      // Very dark green для бор, смърч
+                'Брезови': '#66BB6A'      // Light green для бреза, елша
+            };
+
+            // Get color based on family or default green
+            var color = colors[familyName] || '#4CAF50';
+            
+            // Create minimalistic tree SVG icon
+            var treeSvg = `
+                <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Trunk -->
+                    <rect x="13" y="25" width="4" height="15" fill="#8B4513" rx="1"/>
+                    <!-- Leaves/Crown - different shapes based on genus -->
+                    ${getTreeCrown(genusName, color)}
+                </svg>
+            `;
+
+            return L.divIcon({
+                html: treeSvg,
+                className: 'custom-tree-icon',
+                iconSize: [30, 40],
+                iconAnchor: [15, 40],
+                popupAnchor: [0, -40]
+            });
+        }
+
+        // Function to get different tree crown shapes
+        function getTreeCrown(genusName, color) {
+            var crown = '';
+            
+            if (genusName.includes('Quercus') || genusName.includes('Fagus')) {
+                // Broadleaf - rounded crown
+                crown = '<circle cx="15" cy="18" r="12" fill="' + color + '"/>';
+            } else if (genusName.includes('Pinus') || genusName.includes('Picea')) {
+                // Conifer - triangular crown
+                crown = '<path d="M 15 8 L 5 25 L 25 25 Z" fill="' + color + '"/>';
+            } else if (genusName.includes('Betula') || genusName.includes('Alnus')) {
+                // Slender - oval crown
+                crown = '<ellipse cx="15" cy="18" rx="10" ry="14" fill="' + color + '"/>';
+            } else {
+                // Default - rounded crown
+                crown = '<circle cx="15" cy="18" r="11" fill="' + color + '"/>';
+            }
+            
+            return crown;
+        }
+
+        // Масив за bounds - включва училището и всички дървета
+        var boundsPoints = [[schoolLat, schoolLng]];
+
+        // Add markers for each tree
+        trees.forEach(function(tree) {
+            // Проверка за валидни координати
+            if (tree.lat != null && tree.lng != null && 
+                !isNaN(parseFloat(tree.lat)) && !isNaN(parseFloat(tree.lng)) &&
+                tree.lat >= -90 && tree.lat <= 90 && 
+                tree.lng >= -180 && tree.lng <= 180) {
+                
+                var popupContent = '<div style="min-width: 200px;">' +
+                    '<h6><strong>' + (tree.species || 'Неизвестен вид') + '</strong></h6>' +
+                    (tree.latinName ? '<p><em>' + tree.latinName + '</em></p>' : '') +
+                    (tree.age ? '<p>Възраст: ' + tree.age + ' години</p>' : '') +
+                    (tree.height ? '<p>Височина: ' + parseFloat(tree.height).toFixed(2) + ' м</p>' : '') +
+                    (tree.condition ? '<p>Състояние: ' + tree.condition + '</p>' : '') +
+                    '<a href="/Trees/Details/' + tree.id + '" class="btn btn-sm btn-primary" style="margin-top: 5px; display: inline-block;">Виж детайли</a>' +
+                    '</div>';
+
+                // Get custom tree icon based on genus
+                var treeIcon = getTreeIcon(tree.genusName || '', tree.familyName || '');
+
+                var marker = L.marker([parseFloat(tree.lat), parseFloat(tree.lng)], { icon: treeIcon })
+                    .addTo(map)
+                    .bindPopup(popupContent);
+
+                // Добавяме в bounds
+                boundsPoints.push([parseFloat(tree.lat), parseFloat(tree.lng)]);
+            }
+        });
+
+        // Fit map bounds to show school and all trees
+        if (boundsPoints.length > 1) {
+            // If we have trees, fit bounds to show everything
+            var bounds = L.latLngBounds(boundsPoints);
+            map.fitBounds(bounds, { padding: [80, 80], maxZoom: 17 });
+        } else {
+            // Ако няма дървета, просто показваме училището
+            map.setView([schoolLat, schoolLng], 15);
+        }
+    </script>
+}
