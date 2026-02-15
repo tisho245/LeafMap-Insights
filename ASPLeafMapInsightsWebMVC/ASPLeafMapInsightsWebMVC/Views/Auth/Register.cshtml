@@ -1,0 +1,26 @@
+@model ASPLeafMapInsightsWebMVC.ViewModels.RegisterVm
+@{
+    ViewData["Title"] = "Регистрация";
+}
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <h2>Регистрация</h2>
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-2">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" type="email" />
+            </div>
+            <div class="mb-2">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" type="password" />
+            </div>
+            <div class="mb-2">
+                <label asp-for="UserName" class="form-label">Потребителско име (по избор)</label>
+                <input asp-for="UserName" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-primary">Регистрация</button>
+            <a asp-action="Login" class="btn btn-link">Вече имате профил? Влезте</a>
+        </form>
+    </div>
+</div>

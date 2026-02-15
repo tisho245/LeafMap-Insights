@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MAUILeafMapInsights.Pages.RegisterPage"
+             Title="Регистрация">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="12">
+            <Label Text="Регистрация" FontSize="Title" />
+            <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" />
+            <Entry x:Name="PasswordEntry" Placeholder="Парола" IsPassword="True" />
+            <Entry x:Name="UserNameEntry" Placeholder="Потребителско име (по избор)" />
+            <Label x:Name="ErrorLabel" TextColor="Red" IsVisible="False" />
+            <Button Text="Регистрация" Clicked="OnRegisterClicked" />
+            <Button Text="Вход" Clicked="OnGoLoginClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

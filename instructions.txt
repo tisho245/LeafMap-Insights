@@ -1,0 +1,79 @@
+ЗАДАНИЕ: Разпределени приложения – LeafMap Insights
+
+========================================
+КОНТЕКСТ И ФУНКЦИОНАЛНОСТ
+========================================
+
+LeafMap Insights е система за каталогизиране на дървета на карта. 
+Дърветата се описват по ботаническа таксономия: Family (семейство) → Genus (род) → Species (вид).
+Всяко дърво (Tree) има: GPS координати, възраст, височина, състояние, QR код и връзка към вид.
+
+Целеви потребители: регистрирани потребители (преглед, добавяне), администратори (пълно управление).
+
+========================================
+АРХИТЕКТУРА: 3 ПРИЛОЖЕНИЯ
+========================================
+
+--- ПРИЛОЖЕНИЕ 1: Backend API ---
+
+Технология: ASP.NET Core Web API
+Хостиране: На собствен сървър (БД и API заедно). Публичен е само портът на API-то.
+
+Функции:
+1. CRUD операции за всички таблици: Family, Genus, Species, Tree
+2. Login и Register – JWT токени (за Web и Mobile клиенти)
+3. Cloud/хоствана база данни – SQL Server на сървъра (connection string: localhost)
+4. CORS – разрешен достъп от приложения 2 и 3
+
+Модели (Entity Framework):
+- Family: Id, Name, Description
+- Genus: Id, FamilyId, Name, LatinName, Description
+- Species: Id, GenusId, Name, LatinName, Description
+- Tree: Id, SpeciesId, Latitude, Longitude, EstimatedAge, Height, Condition, QRCodeValue, CreatedAt, UpdatedAt
+
+API endpoints (примерна структура):
+- Auth: POST /api/auth/register, POST /api/auth/login (връща JWT)
+- Families: GET, GET/:id, POST, PUT/:id, DELETE/:id
+- Genera: GET (?familyId), GET/:id, POST, PUT/:id, DELETE/:id
+- Species: GET (?genusId), GET/:id, POST, PUT/:id, DELETE/:id
+- Trees: GET, GET/:id, GET/WithinBounds?minLat&minLng&maxLat&maxLng, POST, PUT/:id, DELETE/:id
+
+Всички write операции (POST, PUT, DELETE) – само за автентикирани потребители.
+Админ роля – за управление на Family, Genus, Species (и възможни потребители).
+
+--- ПРИЛОЖЕНИЕ 2: Web App (MVC без CRUD) ---
+
+Технология: ASP.NET Core MVC
+Роля: Клиент към Приложение 1. Няма собствена БД. Контролерите правят HTTP заявки към API.
+
+Функции:
+1. Контролери с HttpClient – извикват API на Приложение 1 (GET, POST, PUT, DELETE)
+2. Views (Razor) – показват данни и формуляри
+3. Login/Register – изпращат заявки към API, съхраняват JWT (cookie/session)
+4. Страници: Начало, Карта с дървета, Списък дървета, Добави дърво, Таксономия (Families/Genera/Species), Админ панел (ако е admin)
+
+Поток:
+- User → View → Controller → HttpClient → API (Приложение 1) → отговор → View
+
+Ключово: Controller не използва DbContext, само IHttpClientFactory за заявки към API.
+
+--- ПРИЛОЖЕНИЕ 3: Mobile App ---
+
+Технология: По избор (React Native, Flutter, .NET MAUI)
+Роля: Същата като Приложение 2 – HTTP/HTTPS заявки към API на Приложение 1.
+
+Функции:
+- Login, Register
+- Преглед на дървета (списък, карта)
+- Добавяне/редактиране на дървета (ако е позволено)
+- Преглед на таксономия
+- JWT се пази локално (Secure Storage / AsyncStorage)
+
+========================================
+ДОПЪЛНИТЕЛНИ ИЗИСКВАНИЯ
+========================================
+
+- Приложение 1: JWT Bearer authentication, Swagger/OpenAPI за документация
+- Приложение 2: appsettings.json с BaseUrl на API (напр. https://yourserver:5000)
+- Приложение 3: Конфигурируем API URL
+- HTTPS за производствено разгръщане

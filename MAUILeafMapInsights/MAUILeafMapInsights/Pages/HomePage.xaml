@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MAUILeafMapInsights.Pages.HomePage"
+             Title="LeafMap Insights">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="20">
+            <Label Text="LeafMap Insights" FontSize="28" FontAttributes="Bold" HorizontalOptions="Center" />
+            <Label Text="Каталогизиране на дървета" TextColor="Gray" HorizontalOptions="Center" />
+            <Button Text="Дървета" Clicked="OnTreesClicked" />
+            <Button Text="Таксономия" Clicked="OnTaxonomyClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
+            <Button Text="Добави дърво" Clicked="OnAddTreeClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
+            <Button x:Name="AuthButton" Text="Вход" Clicked="OnAuthClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

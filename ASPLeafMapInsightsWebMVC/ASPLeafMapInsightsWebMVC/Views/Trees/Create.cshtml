@@ -1,0 +1,73 @@
+@model ASPLeafMapInsightsWebMVC.ViewModels.TreeVm
+@{
+    ViewData["Title"] = "Добави дърво";
+    var divisions = ViewData["Divisions"] as List<ASPLeafMapInsightsWebMVC.ViewModels.DivisionVm> ?? new List<ASPLeafMapInsightsWebMVC.ViewModels.DivisionVm>();
+    var taxonomyClasses = ViewData["TaxonomyClasses"] as List<ASPLeafMapInsightsWebMVC.ViewModels.TaxonomyClassVm> ?? new List<ASPLeafMapInsightsWebMVC.ViewModels.TaxonomyClassVm>();
+    var genera = ViewData["Genera"] as List<ASPLeafMapInsightsWebMVC.ViewModels.GenusVm> ?? new List<ASPLeafMapInsightsWebMVC.ViewModels.GenusVm>();
+    var families = ViewData["Families"] as List<ASPLeafMapInsightsWebMVC.ViewModels.FamilyVm> ?? new List<ASPLeafMapInsightsWebMVC.ViewModels.FamilyVm>();
+    var species = ViewData["Species"] as List<ASPLeafMapInsightsWebMVC.ViewModels.SpeciesVm> ?? new List<ASPLeafMapInsightsWebMVC.ViewModels.SpeciesVm>();
+}
+<h2>Добави дърво</h2>
+<p class="text-muted">Трябва да сте логнати, за да създадете дърво.</p>
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-2">
+        <label asp-for="Name" class="form-label">Име *</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label asp-for="Description" class="form-label">Описание</label>
+        <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <label asp-for="Latitude" class="form-label">Ширина</label>
+            <input asp-for="Latitude" class="form-control" type="number" step="any" value="42.6977" />
+        </div>
+        <div class="col-md-6 mb-2">
+            <label asp-for="Longitude" class="form-label">Дължина</label>
+            <input asp-for="Longitude" class="form-control" type="number" step="any" value="23.3219" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <label asp-for="DivisionId" class="form-label">Отдел</label>
+            <select asp-for="DivisionId" class="form-select">
+                @foreach (var d in divisions)
+                { <option value="@d.Id">@d.Name</option> }
+            </select>
+        </div>
+        <div class="col-md-6 mb-2">
+            <label asp-for="TaxonomyClassId" class="form-label">Клас</label>
+            <select asp-for="TaxonomyClassId" class="form-select">
+                @foreach (var c in taxonomyClasses)
+                { <option value="@c.Id">@c.Name</option> }
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <label asp-for="FamilyId" class="form-label">Семейство</label>
+            <select asp-for="FamilyId" class="form-select">
+                @foreach (var f in families)
+                { <option value="@f.Id">@f.Name</option> }
+            </select>
+        </div>
+        <div class="col-md-6 mb-2">
+            <label asp-for="GenusId" class="form-label">Род</label>
+            <select asp-for="GenusId" class="form-select">
+                @foreach (var g in genera)
+                { <option value="@g.Id">@g.Name</option> }
+            </select>
+        </div>
+    </div>
+    <div class="mb-2">
+        <label asp-for="SpeciesId" class="form-label">Вид</label>
+        <select asp-for="SpeciesId" class="form-select">
+            @foreach (var s in species)
+            { <option value="@s.Id">@s.Name</option> }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Създай</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Отказ</a>
+</form>

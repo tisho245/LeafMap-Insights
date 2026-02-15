@@ -1,0 +1,23 @@
+@model ASPLeafMapInsightsWebMVC.ViewModels.LoginVm
+@{
+    ViewData["Title"] = "Вход";
+}
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <h2>Вход</h2>
+        <form asp-action="Login" method="post">
+            <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-2">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" type="email" />
+            </div>
+            <div class="mb-2">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" type="password" />
+            </div>
+            <button type="submit" class="btn btn-primary">Вход</button>
+            <a asp-action="Register" class="btn btn-link">Нямате профил? Регистрирайте се</a>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+@model List<ASPLeafMapInsightsWebMVC.ViewModels.TreeVm>
+@{
+    ViewData["Title"] = "Дървета";
+}
+<h2>Дървета</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Име</th>
+            <th>Ширина</th>
+            <th>Дължина</th>
+            <th>Вид</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Model)
+        {
+            <tr>
+                <td>@t.Id</td>
+                <td><a asp-action="Details" asp-route-id="@t.Id">@t.Name</a></td>
+                <td>@t.Latitude.ToString("F4")</td>
+                <td>@t.Longitude.ToString("F4")</td>
+                <td>@(t.Species?.Name ?? "-")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@if (!Model.Any())
+{
+    <p class="text-muted">Няма записи. Стартирайте API-то и обновете страницата.</p>
+}

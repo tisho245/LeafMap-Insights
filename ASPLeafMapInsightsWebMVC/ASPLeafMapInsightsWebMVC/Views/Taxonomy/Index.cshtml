@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "Таксономия";
+    var divisions = ViewBag.Divisions as List<ASPLeafMapInsightsWebMVC.ViewModels.DivisionVm> ?? new List<ASPLeafMapInsightsWebMVC.ViewModels.DivisionVm>();
+    var taxonomyClasses = ViewBag.TaxonomyClasses as List<ASPLeafMapInsightsWebMVC.ViewModels.TaxonomyClassVm> ?? new List<ASPLeafMapInsightsWebMVC.ViewModels.TaxonomyClassVm>();
+    var genera = ViewBag.Genera as List<ASPLeafMapInsightsWebMVC.ViewModels.GenusVm> ?? new List<ASPLeafMapInsightsWebMVC.ViewModels.GenusVm>();
+    var families = ViewBag.Families as List<ASPLeafMapInsightsWebMVC.ViewModels.FamilyVm> ?? new List<ASPLeafMapInsightsWebMVC.ViewModels.FamilyVm>();
+    var species = ViewBag.Species as List<ASPLeafMapInsightsWebMVC.ViewModels.SpeciesVm> ?? new List<ASPLeafMapInsightsWebMVC.ViewModels.SpeciesVm>();
+}
+<h2>Таксономия</h2>
+<div class="row">
+    <div class="col-md-2">
+        <h5>Отдели</h5>
+        <ul class="list-group">
+            @foreach (var d in divisions)
+            { <li class="list-group-item">@d.Name</li> }
+        </ul>
+    </div>
+    <div class="col-md-2">
+        <h5>Класове</h5>
+        <ul class="list-group">
+            @foreach (var c in taxonomyClasses)
+            { <li class="list-group-item">@c.Name</li> }
+        </ul>
+    </div>
+    <div class="col-md-2">
+        <h5>Семейства</h5>
+        <ul class="list-group">
+            @foreach (var f in families)
+            { <li class="list-group-item">@f.Name</li> }
+        </ul>
+    </div>
+    <div class="col-md-2">
+        <h5>Родове</h5>
+        <ul class="list-group">
+            @foreach (var g in genera)
+            { <li class="list-group-item">@g.Name</li> }
+        </ul>
+    </div>
+    <div class="col-md-2">
+        <h5>Видове</h5>
+        <ul class="list-group">
+            @foreach (var s in species)
+            { <li class="list-group-item">@s.Name</li> }
+        </ul>
+    </div>
+</div>
+@if (!divisions.Any())
+{
+    <p class="text-muted mt-3">Няма данни. Стартирайте API-то и обновете.</p>
+}

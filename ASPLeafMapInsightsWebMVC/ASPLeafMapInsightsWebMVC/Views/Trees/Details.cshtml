@@ -1,0 +1,22 @@
+@model ASPLeafMapInsightsWebMVC.ViewModels.TreeVm
+@{
+    ViewData["Title"] = Model.Name;
+}
+<h2>@Model.Name</h2>
+<dl class="row">
+    <dt class="col-sm-2">Описание</dt>
+    <dd class="col-sm-10">@(Model.Description ?? "-")</dd>
+    <dt class="col-sm-2">Координати</dt>
+    <dd class="col-sm-10">@Model.Latitude.ToString("F4"), @Model.Longitude.ToString("F4")</dd>
+    <dt class="col-sm-2">Отдел</dt>
+    <dd class="col-sm-10">@(Model.Division?.Name ?? "-")</dd>
+    <dt class="col-sm-2">Клас</dt>
+    <dd class="col-sm-10">@(Model.TaxonomyClass?.Name ?? "-")</dd>
+    <dt class="col-sm-2">Семейство</dt>
+    <dd class="col-sm-10">@(Model.Family?.Name ?? "-")</dd>
+    <dt class="col-sm-2">Род</dt>
+    <dd class="col-sm-10">@(Model.Genus?.Name ?? "-")</dd>
+    <dt class="col-sm-2">Вид</dt>
+    <dd class="col-sm-10">@(Model.Species?.Name ?? "-")</dd>
+</dl>
+<a asp-action="Index" class="btn btn-outline-secondary">Назад към списъка</a>
