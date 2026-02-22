@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Детайли за дърво — LeafMap Insights</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="tree-detail">
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo"><a href="index.html" class="logo-link">LeafMap Insights</a></h1>
+      <p class="tagline">Каталогизиране на дървета на карта</p>
+      <nav class="nav">
+        <a href="index.html" class="nav-link nav-btn">Начало</a>
+        <a href="trees.html" class="nav-link nav-btn">Дървета</a>
+        <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
+        <a href="add-tree.html" class="nav-link nav-btn">Добави дърво</a>
+        <span class="nav-auth">
+          <span id="userEmail" class="user-email"></span>
+          <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
+          <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <a href="trees.html" class="btn btn-ghost back-btn">← Назад към списъка</a>
+    <div id="treeDetailContent" class="tree-detail"></div>
+    <div id="treeDetailLoading" class="loading">Зареждане...</div>
+    <div id="treeDetailError" class="error-msg" hidden></div>
+  </main>
+
+  <footer class="footer">
+    <p>LeafMap Insights — Node.js клиент.</p>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

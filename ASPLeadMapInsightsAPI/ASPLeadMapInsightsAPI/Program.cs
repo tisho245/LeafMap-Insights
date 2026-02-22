@@ -84,7 +84,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// В Development не правим HTTPS redirect, за да не се чупи CORS preflight при заявки от file:// или друг origin към http://localhost:5202
+if (!app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();  // Чете JWT от заглавката и задава User.
 app.UseAuthorization();  // Проверява [Authorize] и роли.

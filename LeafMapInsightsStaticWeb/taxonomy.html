@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Таксономия — LeafMap Insights</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="taxonomy">
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo"><a href="index.html" class="logo-link">LeafMap Insights</a></h1>
+      <p class="tagline">Каталогизиране на дървета на карта</p>
+      <nav class="nav">
+        <a href="index.html" class="nav-link nav-btn">Начало</a>
+        <a href="trees.html" class="nav-link nav-btn">Дървета</a>
+        <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
+        <a href="add-tree.html" class="nav-link nav-btn">Добави дърво</a>
+        <span class="nav-auth">
+          <span id="userEmail" class="user-email"></span>
+          <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
+          <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <h2 class="view-title">Таксономия</h2>
+    <div class="taxonomy-grid">
+      <div class="taxonomy-card">
+        <h3>Отдели (Divisions)</h3>
+        <div id="taxDivisions" class="taxonomy-list"></div>
+      </div>
+      <div class="taxonomy-card">
+        <h3>Класове (Taxonomy Classes)</h3>
+        <div id="taxClasses" class="taxonomy-list"></div>
+      </div>
+      <div class="taxonomy-card">
+        <h3>Семейства (Families)</h3>
+        <div id="taxFamilies" class="taxonomy-list"></div>
+      </div>
+      <div class="taxonomy-card">
+        <h3>Родове (Genera)</h3>
+        <div id="taxGenera" class="taxonomy-list"></div>
+      </div>
+      <div class="taxonomy-card">
+        <h3>Видове (Species)</h3>
+        <div id="taxSpecies" class="taxonomy-list"></div>
+      </div>
+    </div>
+    <div id="taxonomyLoading" class="loading">Зареждане на таксономия...</div>
+    <div id="taxonomyError" class="error-msg" hidden></div>
+  </main>
+
+  <footer class="footer">
+    <p>LeafMap Insights — API клиент.</p>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

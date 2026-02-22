@@ -1,0 +1,20 @@
+{
+  "name": "leafmap-insights-node-client",
+  "version": "1.0.0",
+  "description": "Node.js клиент за LeafMap Insights API – обслужва уеб интерфейс и подава API URL от сървъра.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["leafmap", "api", "client"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  }
+}

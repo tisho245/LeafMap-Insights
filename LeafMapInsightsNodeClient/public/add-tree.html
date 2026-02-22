@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Добави дърво — LeafMap Insights</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="add-tree">
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo"><a href="index.html" class="logo-link">LeafMap Insights</a></h1>
+      <p class="tagline">Каталогизиране на дървета на карта</p>
+      <nav class="nav">
+        <a href="index.html" class="nav-link nav-btn">Начало</a>
+        <a href="trees.html" class="nav-link nav-btn">Дървета</a>
+        <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
+        <a href="add-tree.html" class="nav-link nav-btn">Добави дърво</a>
+        <span class="nav-auth">
+          <span id="userEmail" class="user-email"></span>
+          <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
+          <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <h2 class="view-title">Добави дърво</h2>
+    <div id="addTreeLoginRequired" class="info-msg" hidden>
+      Моля, <a href="login.html?next=add-tree.html">влезте</a> в системата, за да добавяте дървета.
+    </div>
+    <form id="formAddTree" class="form-add-tree" hidden>
+      <div class="form-row">
+        <label for="treeName">Име</label>
+        <input type="text" id="treeName" name="name" required placeholder="Име на дървото">
+      </div>
+      <div class="form-row two-cols">
+        <div>
+          <label for="treeLat">Ширина (Latitude)</label>
+          <input type="number" id="treeLat" name="latitude" step="any" required placeholder="42.6977">
+        </div>
+        <div>
+          <label for="treeLng">Дължина (Longitude)</label>
+          <input type="number" id="treeLng" name="longitude" step="any" required placeholder="23.3219">
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="treeDescription">Описание</label>
+        <textarea id="treeDescription" name="description" rows="3" placeholder="Кратко описание (по избор)"></textarea>
+      </div>
+      <div class="form-row">
+        <label for="treeDivisionId">Отдел</label>
+        <select id="treeDivisionId" name="divisionId" required></select>
+      </div>
+      <div class="form-row">
+        <label for="treeTaxonomyClassId">Клас</label>
+        <select id="treeTaxonomyClassId" name="taxonomyClassId" required></select>
+      </div>
+      <div class="form-row">
+        <label for="treeFamilyId">Семейство</label>
+        <select id="treeFamilyId" name="familyId" required></select>
+      </div>
+      <div class="form-row">
+        <label for="treeGenusId">Род</label>
+        <select id="treeGenusId" name="genusId" required></select>
+      </div>
+      <div class="form-row">
+        <label for="treeSpeciesId">Вид</label>
+        <select id="treeSpeciesId" name="speciesId" required></select>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Запази</button>
+        <button type="reset" class="btn btn-ghost">Изчисти</button>
+      </div>
+    </form>
+    <div id="addTreeSuccess" class="success-msg" hidden></div>
+    <div id="addTreeError" class="error-msg" hidden></div>
+  </main>
+
+  <footer class="footer">
+    <p>LeafMap Insights — Node.js клиент.</p>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Начало — LeafMap Insights</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="home">
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo"><a href="index.html" class="logo-link">LeafMap Insights</a></h1>
+      <p class="tagline">Каталогизиране на дървета на карта</p>
+      <nav class="nav">
+        <a href="index.html" class="nav-link nav-btn">Начало</a>
+        <a href="trees.html" class="nav-link nav-btn">Дървета</a>
+        <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
+        <a href="add-tree.html" class="nav-link nav-btn">Добави дърво</a>
+        <span class="nav-auth">
+          <span id="userEmail" class="user-email"></span>
+          <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
+          <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="hero">
+      <h2>Добре дошли</h2>
+      <p>Преглеждайте дървета по таксономия и местоположение, добавям нови записи и изследвайте каталога.</p>
+      <div class="hero-actions">
+        <a href="trees.html" class="btn btn-primary">Преглед на дървета</a>
+        <a href="taxonomy.html" class="btn btn-secondary">Таксономия</a>
+      </div>
+    </div>
+    <div class="api-status" id="apiStatus">
+      <span class="status-dot"></span>
+      <span>Проверка на връзка с API...</span>
+    </div>
+    <div id="apiStatusHelp" class="api-help" hidden>
+      <p class="api-help-title">Няма връзка с API</p>
+      <p>Въведете адреса на API сървъра (без / в края), напр. <code>https://api.example.com</code> или за локално <code>http://localhost:5202</code>.</p>
+      <div class="api-url-row">
+        <input type="text" id="apiUrlInput" placeholder="https://api.example.com" class="api-url-input">
+        <button type="button" id="apiUrlSave" class="btn btn-primary">Запази и провери</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>LeafMap Insights — API клиент. Задайте адреса на API в полето по-горе.</p>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>
