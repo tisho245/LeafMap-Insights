@@ -1,0 +1,26 @@
+# Git and IDE
+.git
+.gitignore
+.vs
+.vscode
+*.user
+*.suo
+
+# .NET
+**/bin
+**/obj
+**/out
+**/*.user
+**/packages
+
+# Node
+**/node_modules
+**/npm-debug.log
+
+# MAUI / mobile (not run in Docker)
+MAUILeafMapInsights
+
+# Docs and misc
+**/*.md
+!**/README.md
+**/.dockerignore

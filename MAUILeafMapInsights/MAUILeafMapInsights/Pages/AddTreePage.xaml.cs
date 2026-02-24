@@ -30,6 +30,17 @@ public partial class AddTreePage : ContentPage
         LoadTaxonomy();
     }
 
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        EnsureServices();
+        if (!await _auth!.IsLoggedInAsync())
+        {
+            await Shell.Current.GoToAsync("//Login");
+            return;
+        }
+    }
+
     private void EnsureServices()
     {
         _api ??= AppServices.GetRequired<LeafMapApiService>();

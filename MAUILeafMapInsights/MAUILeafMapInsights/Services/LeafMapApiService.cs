@@ -32,21 +32,24 @@ public class LeafMapApiService
             : new AuthenticationHeaderValue("Bearer", token);
     }
 
-    /// <summary>Вход – POST api/auth/login. При успех връща LoginResponse с Token; приложението го записва чрез AuthService.SetTokenAsync.</summary>
+    /// <summary>Вход – POST към Auth API (api/auth/login). При успех връща LoginResponse с Token.</summary>
     public async Task<LoginResponse?> LoginAsync(string email, string password, CancellationToken ct = default)
     {
-        await EnsureTokenAsync();
+        var baseAuth = ApiSettings.AuthApiBaseUrl.TrimEnd('/');
         var body = JsonSerializer.Serialize(new LoginRequest { Email = email, Password = password });
-        var res = await _http.PostAsync("api/auth/login", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        var content = new StringContent(body, Encoding.UTF8, "application/json");
+        var res = await _http.PostAsync($"{baseAuth}/api/auth/login", content, ct);
         if (!res.IsSuccessStatusCode) return null;
         return JsonSerializer.Deserialize<LoginResponse>(await res.Content.ReadAsStringAsync(ct), _jsonOpt);
     }
 
-    /// <summary>Регистрация – POST api/auth/register. При успех връща LoginResponse с Token.</summary>
+    /// <summary>Регистрация – POST към Auth API (api/auth/register). При успех връща LoginResponse с Token.</summary>
     public async Task<LoginResponse?> RegisterAsync(string email, string password, string? userName, CancellationToken ct = default)
     {
+        var baseAuth = ApiSettings.AuthApiBaseUrl.TrimEnd('/');
         var body = JsonSerializer.Serialize(new RegisterRequest { Email = email, Password = password, UserName = userName });
-        var res = await _http.PostAsync("api/auth/register", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        var content = new StringContent(body, Encoding.UTF8, "application/json");
+        var res = await _http.PostAsync($"{baseAuth}/api/auth/register", content, ct);
         if (!res.IsSuccessStatusCode) return null;
         return JsonSerializer.Deserialize<LoginResponse>(await res.Content.ReadAsStringAsync(ct), _jsonOpt);
     }

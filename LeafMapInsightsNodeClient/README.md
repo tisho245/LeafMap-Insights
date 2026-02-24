@@ -23,10 +23,11 @@ npm start
 
 В `.env`:
 
-- **API_BASE_URL** – пълен адрес на API (напр. `https://localhost:7234` или `http://localhost:5202`)
+- **API_BASE_URL** – Data API (дървета, таксономия), напр. `https://localhost:7234`
+- **AUTH_API_BASE_URL** – Auth API (вход, регистрация), напр. `https://localhost:7240`. При един сървър може да съвпада с API_BASE_URL.
 - **PORT** – порт на Node сървъра (по подразбиране 3000)
 
-При зареждане на страницата клиентът вика `GET /api-config` и получава `apiBaseUrl` от сървъра, така че не е нужно да задавате URL в браузъра. Origin е `http://localhost:3000`, което обикновено няма CORS проблеми с API.
+При зареждане клиентът вика `GET /api-config` и получава `apiBaseUrl` и `authApiBaseUrl`; вход/регистрация отиват към Auth API, останалото към Data API.
 
 ## Структура
 

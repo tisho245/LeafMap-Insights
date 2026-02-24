@@ -26,19 +26,23 @@ public class TreesController : Controller
         return View(tree);
     }
 
-    /// <summary>Форма за ново дърво; зарежда референтни списъци (Division, Species и др.) от API за падащи менюта.</summary>
+    /// <summary>Форма за ново дърво; зарежда референтни списъци (Division, Species и др.) от API за падащи менюта. Само за логнати потребители.</summary>
     [HttpGet]
     public async Task<IActionResult> Create(CancellationToken ct)
     {
+        if (string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+            return RedirectToAction("Login", "Auth", new { returnUrl = Url.Action("Create", "Trees") });
         await LoadTaxonomyViewData(ct);
         return View(new TreeVm());
     }
 
-    /// <summary>POST на формата – изпраща данните към API api/trees. При неуспех (напр. нелогнат потребител) показва грешка.</summary>
+    /// <summary>POST на формата – изпраща данните към API api/trees. Само за логнати потребители.</summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(TreeVm model, CancellationToken ct)
     {
+        if (string.IsNullOrEmpty(HttpContext.Session.GetString("Token")))
+            return RedirectToAction("Login", "Auth", new { returnUrl = Url.Action("Create", "Trees") });
         if (string.IsNullOrWhiteSpace(model.Name))
         {
             ModelState.AddModelError(nameof(model.Name), "Името е задължително.");

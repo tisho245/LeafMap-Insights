@@ -2,11 +2,19 @@
  * LeafMap Insights – клиент (Node.js сървър подава API URL чрез /api-config)
  */
 const API_URL_KEY = 'leafmap_api_base_url';
+const AUTH_API_URL_KEY = 'leafmap_auth_api_base_url';
 const TOKEN_KEY = 'leafmap_jwt';
 const DEFAULT_API_URL = 'https://localhost:7234';
+const DEFAULT_AUTH_API_URL = 'https://localhost:7240';
 
 function getApiBaseUrl() {
   return localStorage.getItem(API_URL_KEY) || DEFAULT_API_URL;
+}
+
+function getAuthApiBaseUrl() {
+  const stored = localStorage.getItem(AUTH_API_URL_KEY);
+  if (stored) return stored;
+  return DEFAULT_AUTH_API_URL;
 }
 
 let API_BASE_URL = getApiBaseUrl();
@@ -35,37 +43,69 @@ async function api(endpoint, options = {}) {
   const token = getToken();
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  let res;
   try {
-    res = await fetch(url, { ...options, headers });
+    const res = await axios({
+      url,
+      method: options.method || 'GET',
+      headers,
+      data: options.body !== undefined ? (typeof options.body === 'string' ? options.body : JSON.stringify(options.body)) : undefined
+    });
+    return res.data;
   } catch (e) {
-    const msg = e.message === 'Failed to fetch'
+    if (e.response) {
+      const data = e.response.data;
+      const err = new Error(data?.message || data?.title || e.response.statusText || `HTTP ${e.response.status}`);
+      err.status = e.response.status;
+      err.data = data;
+      throw err;
+    }
+    const msg = (e.message === 'Network Error' || e.code === 'ERR_NETWORK')
       ? `Не може да се свърже с API (${url}). Проверете API_BASE_URL в .env`
       : (e.message || 'Грешка при заявка');
     const err = new Error(msg);
     err.cause = e;
     throw err;
   }
-
-  const text = await res.text();
-  let data = null;
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch (_) {}
-
-  if (!res.ok) {
-    const err = new Error(data?.message || data?.title || res.statusText || `HTTP ${res.status}`);
-    err.status = res.status;
-    err.data = data;
-    throw err;
-  }
-  return data;
 }
 
-function tryFetch(baseUrl, endpoint) {
+/** Заявки към Auth API (login/register). */
+async function authApi(endpoint, options = {}) {
+  const base = getAuthApiBaseUrl();
+  const url = `${base.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
+  const headers = {
+    'Content-Type': 'application/json',
+    ...options.headers
+  };
+  try {
+    const res = await axios({
+      url,
+      method: options.method || 'GET',
+      headers,
+      data: options.body !== undefined ? (typeof options.body === 'string' ? options.body : JSON.stringify(options.body)) : undefined
+    });
+    return res.data;
+  } catch (e) {
+    if (e.response) {
+      const data = e.response.data;
+      const err = new Error(data?.message || data?.title || e.response.statusText || `HTTP ${e.response.status}`);
+      err.status = e.response.status;
+      err.data = data;
+      throw err;
+    }
+    const msg = (e.message === 'Network Error' || e.code === 'ERR_NETWORK')
+      ? `Не може да се свърже с Auth API (${url}). Проверете AUTH_API_BASE_URL в .env.`
+      : (e.message || 'Грешка при заявка');
+    const err = new Error(msg);
+    err.cause = e;
+    throw err;
+  }
+}
+
+async function tryFetch(baseUrl, endpoint) {
   const b = baseUrl || getApiBaseUrl();
   const url = `${b.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
-  return fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
+  const res = await axios.get(url, { headers: { 'Accept': 'application/json' }, validateStatus: () => true });
+  return res;
 }
 
 async function checkApiStatus() {
@@ -80,7 +120,7 @@ async function checkApiStatus() {
   let ok = false;
   try {
     const res = await tryFetch(base, 'api/divisions');
-    ok = res.ok;
+    ok = res.status === 200;
   } catch (_) {}
 
   if (!ok) {
@@ -88,7 +128,7 @@ async function checkApiStatus() {
       if (url === base) continue;
       try {
         const res = await tryFetch(url, 'api/divisions');
-        if (res.ok) {
+        if (res.status === 200) {
           const u = url.replace(/\/$/, '');
           localStorage.setItem(API_URL_KEY, u);
           API_BASE_URL = u;
@@ -168,7 +208,7 @@ function getRedirectUrl() {
 }
 
 async function login(email, password) {
-  const data = await api('api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+  const data = await authApi('api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
   const token = getTokenFromResponse(data);
   if (token) setToken(token);
   updateAuthUI();
@@ -178,7 +218,7 @@ async function login(email, password) {
 async function register(email, password, userName) {
   const body = { email, password };
   if (userName) body.userName = userName;
-  const data = await api('api/auth/register', { method: 'POST', body: JSON.stringify(body) });
+  const data = await authApi('api/auth/register', { method: 'POST', body: JSON.stringify(body) });
   const token = getTokenFromResponse(data);
   if (token) setToken(token);
   updateAuthUI();
@@ -392,8 +432,11 @@ function runInit() {
 
 document.addEventListener('DOMContentLoaded', () => {
   if (window.location.protocol !== 'file:') {
-    fetch('/api-config').then(r => r.json()).then(c => {
-      if (c.apiBaseUrl) localStorage.setItem(API_URL_KEY, c.apiBaseUrl);
+    axios.get('/api-config').then(r => {
+      if (r.data) {
+        if (r.data.apiBaseUrl) localStorage.setItem(API_URL_KEY, r.data.apiBaseUrl);
+        if (r.data.authApiBaseUrl) localStorage.setItem(AUTH_API_URL_KEY, r.data.authApiBaseUrl);
+      }
     }).catch(() => {}).finally(runInit);
   } else {
     runInit();

@@ -2,23 +2,32 @@
 
 ## 1. API URL за емулатор/телефон
 
-По подразбиране приложението вика **https://localhost:7234**. На емулатор/телефон това не работи.
+Приложението използва **два сървъра**: **Data API** (дървета, таксономия) и **Auth API** (вход, регистрация). По подразбиране:
+- **BaseUrl** = https://localhost:7234 (Data API)
+- **AuthApiBaseUrl** = https://localhost:7240 (Auth API)
 
-- **Android емулатор**: използвай адрес на хоста: **http://10.0.2.2:5202** (ако API-то ти е на `http://localhost:5202`). Промени в кода:
-  - В **Services/ApiSettings.cs** задай:  
-    `public static string BaseUrl { get; set; } = "http://10.0.2.2:5202";`
-- **Реално устройство** в същата Wi‑Fi мрежа: сложи API URL на IP-то на компютъра, напр. **http://192.168.1.5:5202**.
+На емулатор/телефон localhost не работи – задай адресите на хоста:
 
-## 2. Стартиране на API-то
+- **Android емулатор**: в **Services/ApiSettings.cs** задай например:
+  - `BaseUrl = "http://10.0.2.2:5202"` (Data API)
+  - `AuthApiBaseUrl = "http://10.0.2.2:5203"` (Auth API)
+- **Реално устройство** в същата Wi‑Fi: използвай IP на компютъра, напр. **http://192.168.1.5:5202** и **http://192.168.1.5:5203**.
 
-Първо пусни API-то на сървъра (ASPLeadMapInsightsAPI). За емулатор трябва да слуша на всички интерфейси (не само localhost), напр.:
+## 2. Стартиране на API-тата
+
+Пусни и двата сървъра (Data и Auth API). За емулатор те трябва да слушат на всички интерфейси, напр.:
 
 ```bash
+# Терминал 1 – Data API
 cd "ASPLeadMapInsightsAPI\ASPLeadMapInsightsAPI"
 dotnet run --urls "http://0.0.0.0:5202"
+
+# Терминал 2 – Auth API
+cd "LeafMapInsightsAuthAPI\LeafMapInsightsAuthAPI"
+dotnet run --urls "http://0.0.0.0:5203"
 ```
 
-Така от емулатора ще може да достъпиш с **http://10.0.2.2:5202**.
+От емулатора достъп: **http://10.0.2.2:5202** (Data) и **http://10.0.2.2:5203** (Auth).
 
 ## 3. Пусни Android приложението
 
@@ -38,4 +47,4 @@ dotnet run --urls "http://0.0.0.0:5202"
 - **Вход** – Login/Register към API; JWT се пази в SecureStorage.
 - **Добави дърво** – формуляр (изисква логнат потребител).
 
-Преди да тестваш, увери се че **ApiSettings.BaseUrl** съвпада с адреса на API-то от емулатора/телефона.
+Преди да тестваш, увери се че **ApiSettings.BaseUrl** и **ApiSettings.AuthApiBaseUrl** съвпадат с адресите на Data и Auth API от емулатора/телефона.

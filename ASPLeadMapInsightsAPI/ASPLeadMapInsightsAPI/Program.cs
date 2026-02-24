@@ -1,38 +1,22 @@
 using System.Text;
 using ASPLeadMapInsightsAPI.Data;
-using ASPLeadMapInsightsAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-// --- Конфигурация на услуги ---
+// --- Data API: trees, taxonomy. JWT is validated only (tokens issued by Auth API). ---
 var builder = WebApplication.CreateBuilder(args);
 
-// База данни: SQL Server (LocalDB в разработка). LeafMapDbContext съдържа таблиците за таксономия + Identity.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<LeafMapDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// ASP.NET Core Identity – потребители, пароли, роли. Храни се в същата БД чрез LeafMapDbContext.
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-{
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 6;
-})
-.AddEntityFrameworkStores<LeafMapDbContext>()
-.AddDefaultTokenProviders();
-
-// JWT: ключът за подпис и параметрите за валидация – същите трябва да са в appsettings и при клиентите.
+// JWT validation only – same Key/Issuer/Audience as Auth API so tokens from Auth server are accepted.
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key not set.");
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "LeafMapInsightsAPI";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "LeafMapInsights";
 
-// Автентикация по Bearer токен. Всички [Authorize] заявки изискват валиден JWT в заглавката Authorization.
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -52,7 +36,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -1,10 +1,11 @@
 namespace MAUILeafMapInsights.Services;
 
 /// <summary>
-/// Базов URL на LeafMap API. По подразбиране localhost; за Android емулатор използвайте http://10.0.2.2:5202
-/// (10.0.2.2 сочи към host машината от емулатора).
+/// Data API – дървета, таксономия. Auth API – вход, регистрация (отделен сървър при split).
+/// За Android емулатор: BaseUrl = http://10.0.2.2:5202, AuthApiBaseUrl = http://10.0.2.2:5203 (ако Auth е на 5203).
 /// </summary>
 public static class ApiSettings
 {
     public static string BaseUrl { get; set; } = "https://localhost:7234";
+    public static string AuthApiBaseUrl { get; set; } = "https://localhost:7240";
 }

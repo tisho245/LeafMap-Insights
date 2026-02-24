@@ -1,0 +1,87 @@
+# LeafMap Insights – всички услуги в Docker
+# От корена на репо: docker-compose up -d
+# После: Data API http://localhost:5202, Auth API http://localhost:5203, MVC http://localhost:5000, Node client http://localhost:3000, Static http://localhost:8080
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YourStrong!Pass123"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    # SQL Server may take 20–30s to be ready. If APIs fail on first start, run: docker-compose restart dataapi authapi
+
+  dataapi:
+    build:
+      context: .
+      dockerfile: ASPLeadMapInsightsAPI/ASPLeadMapInsightsAPI/Dockerfile
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=LeafMapInsights;User Id=sa;Password=YourStrong!Pass123;TrustServerCertificate=True;"
+      Jwt__Key: "YourSecretKeyAtLeast32CharactersLong!"
+      Jwt__Issuer: "LeafMapInsightsAPI"
+      Jwt__Audience: "LeafMapInsights"
+      Jwt__ExpiresMinutes: "60"
+    ports:
+      - "5202:80"
+    depends_on:
+      - sqlserver
+    restart: on-failure
+
+  authapi:
+    build:
+      context: .
+      dockerfile: LeafMapInsightsAuthAPI/LeafMapInsightsAuthAPI/Dockerfile
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=LeafMapInsights;User Id=sa;Password=YourStrong!Pass123;TrustServerCertificate=True;"
+      Jwt__Key: "YourSecretKeyAtLeast32CharactersLong!"
+      Jwt__Issuer: "LeafMapInsightsAPI"
+      Jwt__Audience: "LeafMapInsights"
+      Jwt__ExpiresMinutes: "60"
+    ports:
+      - "5203:80"
+    depends_on:
+      - sqlserver
+    restart: on-failure
+
+  mvc:
+    build:
+      context: .
+      dockerfile: ASPLeafMapInsightsWebMVC/ASPLeafMapInsightsWebMVC/Dockerfile
+    environment:
+      ApiBaseUrl: "http://dataapi:80"
+      AuthApiBaseUrl: "http://authapi:80"
+    ports:
+      - "5000:80"
+    depends_on:
+      - dataapi
+      - authapi
+
+  nodeclient:
+    build:
+      context: .
+      dockerfile: LeafMapInsightsNodeClient/Dockerfile
+    environment:
+      API_BASE_URL: "http://localhost:5202"
+      AUTH_API_BASE_URL: "http://localhost:5203"
+      PORT: "3000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - dataapi
+      - authapi
+
+  staticweb:
+    build:
+      context: .
+      dockerfile: LeafMapInsightsStaticWeb/Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - dataapi
+      - authapi
+
+volumes:
+  sqlserver_data:

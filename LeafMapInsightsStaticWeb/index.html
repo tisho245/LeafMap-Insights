@@ -43,10 +43,19 @@
     </div>
     <div id="apiStatusHelp" class="api-help" hidden>
       <p class="api-help-title">Няма връзка с API</p>
-      <p>Въведете адреса на API сървъра (без / в края), напр. <code>https://api.example.com</code> или за локално <code>http://localhost:5202</code>.</p>
+      <p>При <strong>два сървъра</strong> задайте и двата адреса. Ако Auth API е празно, използва се адресът на Data API (един сървър). Ако отваряте от <code>file://</code>, заявките могат да се блокират (CORS) – обслужвайте папката чрез HTTP (напр. <code>npx serve .</code> или Live Server).</p>
       <div class="api-url-row">
-        <input type="text" id="apiUrlInput" placeholder="https://api.example.com" class="api-url-input">
+        <p style="margin: 0 0 0.25rem 0; font-size: 0.9rem; color: var(--text-muted);">Data API (дървета, таксономия):</p>
+      </div>
+      <div class="api-url-row">
+        <input type="text" id="apiUrlInput" placeholder="https://localhost:7234" class="api-url-input" title="Data API">
         <button type="button" id="apiUrlSave" class="btn btn-primary">Запази и провери</button>
+      </div>
+      <div class="api-url-row" style="margin-top: 0.5rem;">
+        <p style="margin: 0 0 0.25rem 0; font-size: 0.9rem; color: var(--text-muted);">Auth API (вход, регистрация) – по избор:</p>
+      </div>
+      <div class="api-url-row">
+        <input type="text" id="authApiUrlInput" placeholder="https://localhost:7240 или празно" class="api-url-input" title="Auth API">
       </div>
     </div>
   </main>
@@ -54,6 +63,7 @@
   <footer class="footer">
     <p>LeafMap Insights — API клиент. Задайте адреса на API в полето по-горе.</p>
   </footer>
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6/dist/axios.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

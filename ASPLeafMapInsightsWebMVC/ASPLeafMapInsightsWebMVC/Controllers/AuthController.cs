@@ -38,8 +38,8 @@ public class AuthController : Controller
             return View(model);
         }
 
-        var baseUrl = _config["ApiBaseUrl"]?.TrimEnd('/') ?? "";
-        var client = _factory.CreateClient();
+        var baseUrl = (_config["AuthApiBaseUrl"] ?? _config["ApiBaseUrl"])?.TrimEnd('/') ?? "";
+        var client = _factory.CreateClient("LeafMapAuthApi");
         var json = JsonSerializer.Serialize(new { email = model.Email, password = model.Password });
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         var res = await client.PostAsync($"{baseUrl}/api/auth/login", content, ct);
@@ -75,8 +75,8 @@ public class AuthController : Controller
             return View(model);
         }
 
-        var baseUrl = _config["ApiBaseUrl"]?.TrimEnd('/') ?? "";
-        var client = _factory.CreateClient();
+        var baseUrl = (_config["AuthApiBaseUrl"] ?? _config["ApiBaseUrl"])?.TrimEnd('/') ?? "";
+        var client = _factory.CreateClient("LeafMapAuthApi");
         var json = JsonSerializer.Serialize(new { email = model.Email, password = model.Password, userName = model.UserName });
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         var res = await client.PostAsync($"{baseUrl}/api/auth/register", content, ct);

@@ -4,11 +4,19 @@
  * (при "failed to fetch" API често не слуша на този адрес или е затворен).
  */
 const API_URL_KEY = 'leafmap_api_base_url';
+const AUTH_API_URL_KEY = 'leafmap_auth_api_base_url';
 const TOKEN_KEY = 'leafmap_jwt';
 const DEFAULT_API_URL = 'https://localhost:7234';
+const DEFAULT_AUTH_API_URL = 'https://localhost:7240';
 
 function getApiBaseUrl() {
   return localStorage.getItem(API_URL_KEY) || DEFAULT_API_URL;
+}
+
+function getAuthApiBaseUrl() {
+  const stored = localStorage.getItem(AUTH_API_URL_KEY);
+  if (stored) return stored;
+  return DEFAULT_AUTH_API_URL;
 }
 
 let API_BASE_URL = getApiBaseUrl();
@@ -37,38 +45,70 @@ async function api(endpoint, options = {}) {
   const token = getToken();
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  let res;
   try {
-    res = await fetch(url, { ...options, headers });
+    const res = await axios({
+      url,
+      method: options.method || 'GET',
+      headers,
+      data: options.body !== undefined ? (typeof options.body === 'string' ? options.body : JSON.stringify(options.body)) : undefined
+    });
+    return res.data;
   } catch (e) {
-    const msg = e.message === 'Failed to fetch'
+    if (e.response) {
+      const data = e.response.data;
+      const err = new Error(data?.message || data?.title || e.response.statusText || `HTTP ${e.response.status}`);
+      err.status = e.response.status;
+      err.data = data;
+      throw err;
+    }
+    const msg = (e.message === 'Network Error' || e.code === 'ERR_NETWORK')
       ? `Не може да се свърже с API (${url}). Пуснете ли API-то? Опитайте: http://localhost:5202 или https://localhost:7234`
       : (e.message || 'Грешка при заявка');
     const err = new Error(msg);
     err.cause = e;
     throw err;
   }
+}
 
-  const text = await res.text();
-  let data = null;
+/** Заявки към Auth API (login/register). Използва отделен URL ако е зададен. */
+async function authApi(endpoint, options = {}) {
+  const base = getAuthApiBaseUrl();
+  const url = `${base.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
+  const headers = {
+    'Content-Type': 'application/json',
+    ...options.headers
+  };
   try {
-    data = text ? JSON.parse(text) : null;
-  } catch (_) {}
-
-  if (!res.ok) {
-    const err = new Error(data?.message || data?.title || res.statusText || `HTTP ${res.status}`);
-    err.status = res.status;
-    err.data = data;
+    const res = await axios({
+      url,
+      method: options.method || 'GET',
+      headers,
+      data: options.body !== undefined ? (typeof options.body === 'string' ? options.body : JSON.stringify(options.body)) : undefined
+    });
+    return res.data;
+  } catch (e) {
+    if (e.response) {
+      const data = e.response.data;
+      const err = new Error(data?.message || data?.title || e.response.statusText || `HTTP ${e.response.status}`);
+      err.status = e.response.status;
+      err.data = data;
+      throw err;
+    }
+    const msg = (e.message === 'Network Error' || e.code === 'ERR_NETWORK')
+      ? `Не може да се свърже с Auth API (${url}). Пуснете ли Auth API (напр. https://localhost:7240)?`
+      : (e.message || 'Грешка при заявка');
+    const err = new Error(msg);
+    err.cause = e;
     throw err;
   }
-  return data;
 }
 
 // ---------- Проверка на API ----------
-function tryFetch(baseUrl, endpoint) {
+async function tryFetch(baseUrl, endpoint) {
   const b = baseUrl || getApiBaseUrl();
   const url = `${b.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
-  return fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
+  const res = await axios.get(url, { headers: { 'Accept': 'application/json' }, validateStatus: () => true });
+  return res;
 }
 
 async function checkApiStatus() {
@@ -83,7 +123,7 @@ async function checkApiStatus() {
   let ok = false;
   try {
     const res = await tryFetch(base, 'api/divisions');
-    ok = res.ok;
+    ok = res.status === 200;
   } catch (_) {}
 
   if (!ok) {
@@ -91,7 +131,7 @@ async function checkApiStatus() {
       if (url === base) continue;
       try {
         const res = await tryFetch(url, 'api/divisions');
-        if (res.ok) {
+        if (res.status === 200) {
           const u = url.replace(/\/$/, '');
           localStorage.setItem(API_URL_KEY, u);
           API_BASE_URL = u;
@@ -123,6 +163,15 @@ function saveApiUrlAndCheck() {
   if (!url) return;
   API_BASE_URL = url;
   localStorage.setItem(API_URL_KEY, url);
+  const authInput = document.getElementById('authApiUrlInput');
+  if (authInput) {
+    const authUrl = authInput.value.trim().replace(/\/+$/, '');
+    if (authUrl) {
+      localStorage.setItem(AUTH_API_URL_KEY, authUrl);
+    } else {
+      localStorage.setItem(AUTH_API_URL_KEY, url);
+    }
+  }
   checkApiStatus();
 }
 
@@ -173,7 +222,7 @@ function getRedirectUrl() {
 }
 
 async function login(email, password) {
-  const data = await api('api/auth/login', {
+  const data = await authApi('api/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password })
   });
@@ -188,7 +237,7 @@ async function login(email, password) {
 async function register(email, password, userName) {
   const body = { email, password };
   if (userName) body.userName = userName;
-  const data = await api('api/auth/register', {
+  const data = await authApi('api/auth/register', {
     method: 'POST',
     body: JSON.stringify(body)
   });
@@ -389,6 +438,15 @@ function escapeHtml(s) {
 
 // ---------- Инициализация ----------
 document.addEventListener('DOMContentLoaded', () => {
+  if (typeof axios === 'undefined') {
+    console.error('LeafMap: axios не е зареден. Проверете интернет връзката или блокиране на CDN и презаредете страницата.');
+    const status = document.getElementById('apiStatus');
+    if (status) {
+      status.classList.add('error');
+      status.querySelector('span:last-child').textContent = 'Грешка: axios не е зареден. Презаредете или отворете от HTTP сървър.';
+    }
+    return;
+  }
   updateAuthUI();
   highlightNav();
 
@@ -442,5 +500,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (apiUrlInput) {
     apiUrlInput.value = API_BASE_URL;
     apiUrlInput.addEventListener('keydown', e => { if (e.key === 'Enter') saveApiUrlAndCheck(); });
+  }
+  const authApiUrlInput = document.getElementById('authApiUrlInput');
+  if (authApiUrlInput) {
+    authApiUrlInput.value = getAuthApiBaseUrl();
+    authApiUrlInput.placeholder = getApiBaseUrl();
+    authApiUrlInput.addEventListener('keydown', e => { if (e.key === 'Enter') saveApiUrlAndCheck(); });
   }
 });

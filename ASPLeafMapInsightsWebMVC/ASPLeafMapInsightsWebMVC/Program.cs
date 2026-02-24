@@ -1,10 +1,15 @@
 using ASPLeafMapInsightsWebMVC.Services;
 var builder = WebApplication.CreateBuilder(args);
 
-// Именуван HttpClient за API заявки. В разработка игнорираме SSL грешки (само за localhost).
+// Data API (trees, taxonomy). В разработка игнорираме SSL за localhost.
 var leafMapBuilder = builder.Services.AddHttpClient("LeafMapApi");
 if (builder.Environment.IsDevelopment())
     leafMapBuilder.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { ServerCertificateCustomValidationCallback = (_, _, _, _) => true });
+
+// Auth API (login, register). Отделен сървър при split; в разработка също игнорираме SSL.
+var authBuilder = builder.Services.AddHttpClient("LeafMapAuthApi");
+if (builder.Environment.IsDevelopment())
+    authBuilder.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { ServerCertificateCustomValidationCallback = (_, _, _, _) => true });
 
 builder.Services.AddHttpContextAccessor();  // За LeafMapApiClient – достъп до Session за JWT.
 builder.Services.AddScoped<ILeafMapApiClient, LeafMapApiClient>();
