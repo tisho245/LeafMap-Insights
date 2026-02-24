@@ -20,6 +20,19 @@ public partial class LoginPage : ContentPage
         _auth ??= AppServices.GetRequired<AuthService>();
     }
 
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        EnsureServices();
+        if (await _auth!.IsLoggedInAsync())
+        {
+            await _auth.RemoveTokenAsync();
+            if (Shell.Current is AppShell shell)
+                shell.UpdateAuthFlyoutTitleAsync();
+            await Shell.Current.GoToAsync("//Home");
+        }
+    }
+
     /// <summary>Вика api/auth/login; при успех записва Token в SecureStorage и отива към списъка с дървета.</summary>
     private async void OnLoginClicked(object sender, EventArgs e)
     {
@@ -43,6 +56,8 @@ public partial class LoginPage : ContentPage
         }
 
         await _auth!.SetTokenAsync(resp.Token);
+        if (Shell.Current is AppShell shell)
+            shell.UpdateAuthFlyoutTitleAsync();
         await Shell.Current.GoToAsync("//Trees");
     }
 

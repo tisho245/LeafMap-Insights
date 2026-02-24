@@ -18,13 +18,13 @@
                     │                                     │
         ┌───────────▼───────────┐           ┌──────────────▼──────────────┐
         │ ПРИЛОЖЕНИЕ 2:        │           │ ПРИЛОЖЕНИЕ 3:               │
-        │ Web MVC              │           │ Mobile (MAUI, Android)      │
-        │ (ASPLeafMapInsights   │           │ (MAUILeafMapInsights)      │
-        │  WebMVC)             │           │                             │
+        │ Node.js уеб сайт      │           │ Mobile (MAUI, Android)      │
+        │ (LeafMapInsights      │           │ (MAUILeafMapInsights)      │
+        │  NodeClient)         │           │                             │
         │ • Няма БД            │           │ • Няма БД                   │
-        │ • HttpClient → API   │           │ • HttpClient → API          │
-        │ • JWT в сесия        │           │ • JWT в SecureStorage        │
-        │ • Razor Views        │           │ • XAML страници              │
+        │ • /api-config, статични│           │ • HttpClient → API          │
+        │ • Браузър → Auth/Data API, JWT в localStorage │ • JWT в SecureStorage        │
+        │ • HTML/JS в public/  │           │ • XAML страници              │
         └─────────────────────┘           └─────────────────────────────┘
 ```
 
@@ -62,30 +62,19 @@
 
 ---
 
-### 2.2. В Web MVC (Приложение 2)
+### 2.2. В Node.js уеб сайт (Приложение 2)
 
-**Роля**: няма собствена БД за дървета/таксономия. Контролерите **само** изпращат HTTP заявки към API и подават резултата към View.
+**Роля**: няма собствена БД. Express сървърът обслужва статични файлове от `public/` и подава API адресите чрез `GET /api-config` (от `.env`). Браузърът (JavaScript в `public/app.js`) изпраща заявки **директно** към Auth API и Data API; JWT се пази в **localStorage**.
 
 | Файл | Роля |
 |------|------|
-| `Controllers/HomeController.cs` | Показва начална страница (само View). |
-| `Controllers/AuthController.cs` | GET/POST за Login и Register. При POST вика `POST {ApiBaseUrl}/api/auth/login` или `.../register`, чете отговора и ако има `token`, записва го в **сесията** (`HttpContext.Session.SetString("Token", token)`). Logout изтрива токена от сесията. |
-| `Controllers/TreesController.cs` | Index/Details/Create. Използва `ILeafMapApiClient` (обвивка над HttpClient): `_api.GetAsync<List<TreeVm>>("api/trees?includeLookups=true")`, `_api.PostAsync("api/trees", body)` и т.н. |
-| `Controllers/TaxonomyController.cs` | Вика `_api.GetAsync(...)` за divisions, taxonomyclasses, genera, families, species и подава данните към View. |
-| `Controllers/MapController.cs` | Вика API за списък дървета и ги подава към View. |
+| `server.js` | Express: `express.static('public')`, `GET /api-config` → `{ apiBaseUrl, authApiBaseUrl }`. |
+| `public/app.js` | Вход, регистрация, списък дървета, детайли, карта, таксономия, добавяне на дърво. Вика Auth API за login/register и Data API за trees, divisions и т.н. Чете/записва токен в localStorage. |
 
-**Ключово**: в нито един от тези контролери **няма** `DbContext` или директна работа с БД. Всички данни идват от отговорите на API-то чрез `ILeafMapApiClient`.
+**Ключово**: Node сървърът **не** прави прокси заявки към API – само подава конфигурация. Всички данни минават директно от браузъра към Auth API и Data API.
 
-**Как се подава JWT от Web към API**  
-`Services/LeafMapApiClient.cs` при всяка заявка чете токена от сесията и го слага в заглавката:
-
-```csharp
-var token = _httpContext.HttpContext?.Session.GetString("Token");
-if (!string.IsNullOrEmpty(token))
-    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-```
-
-Така при POST/PUT/DELETE към API, заявките автоматично носят токена и API-то ги приема като автентикирани.
+**Как се подава JWT от браузъра към API**  
+В `public/app.js` при всяка заявка се чете токенът от `localStorage` и се слага в заглавката `Authorization: Bearer <token>`. Така заявките към Data API (списък дървета, добавяне и т.н.) носят токена и API-то ги приема като автентикирани.
 
 ---
 
@@ -190,8 +179,7 @@ builder.Services.AddAuthentication(options => { ... })
 
 | Клиент | Файл | Как се пази |
 |--------|------|-------------|
-| Web MVC | `AuthController.cs` | При успешен login/register: `HttpContext.Session.SetString("Token", token)`. При logout: `HttpContext.Session.Remove("Token")`. |
-| Web MVC | `LeafMapApiClient.cs` | При всяка заявка: `var token = _httpContext.HttpContext?.Session.GetString("Token")` и слага го в `Authorization: Bearer ...`. |
+| Node.js сайт / Static Web | `public/app.js` (или `app.js`) | При успешен login/register: `localStorage.setItem(TOKEN_KEY, token)`. При logout: `localStorage.removeItem(TOKEN_KEY)`. При всяка заявка се чете токенът и се слага в `Authorization: Bearer ...`. |
 | Mobile MAUI | `AuthService.cs` | `SecureStorage.Default.SetAsync("LeafMapJwtToken", token)` при login/register; `SecureStorage.Default.GetAsync("LeafMapJwtToken")` при четене; `SecureStorage.Default.Remove("LeafMapJwtToken")` при изход. |
 | Mobile MAUI | `LeafMapApiService.cs` | Преди всяка заявка вика `EnsureTokenAsync()`, който взима токена от `AuthService` и го задава на `_http.DefaultRequestHeaders.Authorization`. |
 
@@ -204,7 +192,7 @@ builder.Services.AddAuthentication(options => { ... })
 1. Потребител въвежда email/парола в Web или Mobile.
 2. Клиентът изпраща `POST /api/auth/login` с JSON `{ "email": "...", "password": "..." }`.
 3. API (`AuthController`) проверява с Identity и при успех вика `JwtService.GenerateToken(...)` и връща `{ "token": "...", "email": "...", "expiresAt": "..." }`.
-4. Web записва `token` в сесията; Mobile записва в SecureStorage.
+4. Уеб (Node/Static) записва `token` в localStorage; Mobile записва в SecureStorage.
 5. При следваща заявка (напр. `POST /api/trees`) клиентът добавя заглавка `Authorization: Bearer <token>`.
 6. В API middleware-ът за JWT валидира токена; ако е валиден, заявката стига до контролера и `[Authorize]` е удовлетворен.
 7. След изтичане на срока на токена (напр. 60 мин) валидацията връща грешка и клиентът трябва отново да викне login, за да получи нов токен.
@@ -219,10 +207,10 @@ builder.Services.AddAuthentication(options => { ... })
 | Login/Register endpoints и връщане на token | `ASPLeadMapInsightsAPI/Controllers/AuthController.cs` |
 | Конфигурация за валидиране на JWT (ключ, issuer, audience) | `ASPLeadMapInsightsAPI/Program.cs` (AddJwtBearer) и `appsettings.json` (секция Jwt) |
 | Защита на write операции (изискване за токен) | `[Authorize]` върху POST/PUT/DELETE в контролерите в API |
-| Запазване на токена в Web | `ASPLeafMapInsightsWebMVC/Controllers/AuthController.cs` (Session); използване при заявки: `Services/LeafMapApiClient.cs` |
+| Запазване на токена в уеб (Node/Static) | `LeafMapInsightsNodeClient/public/app.js` или `LeafMapInsightsStaticWeb/app.js` (localStorage); при всяка заявка се чете и слага в Authorization |
 | Запазване на токена в Mobile | `MAUILeafMapInsights/Services/AuthService.cs` (SecureStorage); използване при заявки: `Services/LeafMapApiService.cs` (EnsureTokenAsync) |
 | CRUD в API (как се чете/пише в БД) | Всички `Controllers/*.cs` в API + `Data/LeafMapDbContext.cs` |
-| CRUD от Web (без БД, само HTTP) | `ASPLeafMapInsightsWebMVC/Controllers/TreesController.cs`, `TaxonomyController.cs` и др. + `Services/LeafMapApiClient.cs` |
+| CRUD от уеб (без БД, само HTTP) | Браузърът вика директно Data API от `public/app.js` (Node) или `app.js` (Static); няма сървърни контролери за trees/taxonomy |
 | Извиквания към API от Mobile | `MAUILeafMapInsights/Services/LeafMapApiService.cs` и `Pages/*.xaml.cs` |
 
 С тази документация може да проследиш как се свързват приложенията, как работят контролерите и как точно JWT се издава, пази и валидира в кода. Когато дооправяш нещо, можеш да допълваш този файл с конкретни промени.

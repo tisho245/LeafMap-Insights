@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2025-02-24T12:00:00.000Z" agent="LeafMap" version="22.1.0" type="device">
+  <diagram name="Sequence - MAUI" id="maui-seq">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="1500" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="title" value="MAUILeafMapInsights – Sequence Diagram" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="200" y="10" width="700" height="24" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane-user" value="Потребител" style="swimlane;horizontal=0;startSize=32;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="20" y="50" width="160" height="1420" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane-maui" value="MAUI App" style="swimlane;horizontal=0;startSize=32;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="200" y="50" width="160" height="1420" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane-authsvc" value="AuthService" style="swimlane;horizontal=0;startSize=32;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="380" y="50" width="160" height="1420" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane-api" value="LeafMapApi" style="swimlane;horizontal=0;startSize=32;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="560" y="50" width="160" height="1420" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane-auth" value="Auth API" style="swimlane;horizontal=0;startSize=32;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="740" y="50" width="160" height="1420" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane-data" value="Data API" style="swimlane;horizontal=0;startSize=32;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="920" y="50" width="160" height="1420" as="geometry"/>
+        </mxCell>
+        <mxCell id="m1" value="1. Отваря приложението" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.02;entryX=0;entryY=0.02;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-user" target="lane-maui" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m2" value="2. GetTokenAsync()" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.03;entryX=0;entryY=0.03;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-maui" target="lane-authsvc" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m3" value="3. token / null" style="endArrow=open;endFill=0;html=1;dashed=1;exitX=0;exitY=0.04;entryX=1;entryY=0.04;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-authsvc" target="lane-maui" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m4" value="4. Показва Вход/Изход" style="endArrow=open;endFill=0;html=1;dashed=1;exitX=0;exitY=0.05;entryX=1;entryY=0.05;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-maui" target="lane-user" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m5" value="5. Клик Вход → LoginPage" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.06;entryX=0;entryY=0.06;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-user" target="lane-maui" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m6" value="6. LoginAsync(email, password)" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.07;entryX=0;entryY=0.07;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-maui" target="lane-api" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m7" value="7. POST api/auth/login" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.08;entryX=0;entryY=0.08;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-api" target="lane-auth" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m8" value="8. { token, email, expiresAt }" style="endArrow=open;endFill=0;html=1;dashed=1;exitX=0;exitY=0.09;entryX=1;entryY=0.09;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-auth" target="lane-api" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m9" value="9. LoginResponse" style="endArrow=open;endFill=0;html=1;dashed=1;exitX=0;exitY=0.10;entryX=1;entryY=0.10;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-api" target="lane-maui" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m10" value="10. SetTokenAsync(token)" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.11;entryX=0;entryY=0.11;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-maui" target="lane-authsvc" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m11" value="11. GoToAsync(//Trees)" style="endArrow=open;endFill=0;html=1;dashed=1;exitX=0;exitY=0.12;entryX=1;entryY=0.12;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-maui" target="lane-user" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m12" value="12. Trees (списък)" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.13;entryX=0;entryY=0.13;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-user" target="lane-maui" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m13" value="13. GetTreesAsync()" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.14;entryX=0;entryY=0.14;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-maui" target="lane-api" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m14" value="14. GetTokenAsync()" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.15;entryX=0;entryY=0.15;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-api" target="lane-authsvc" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m15" value="15. token" style="endArrow=open;endFill=0;html=1;dashed=1;exitX=0;exitY=0.16;entryX=1;entryY=0.16;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-authsvc" target="lane-api" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m16" value="16. GET api/trees [Bearer]" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.17;entryX=0;entryY=0.17;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-api" target="lane-data" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m17" value="17. List&lt;TreeDto&gt;" style="endArrow=open;endFill=0;html=1;dashed=1;exitX=0;exitY=0.18;entryX=1;entryY=0.18;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-data" target="lane-api" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m18" value="18. данни → Показва списък" style="endArrow=open;endFill=0;html=1;dashed=1;exitX=0;exitY=0.19;entryX=1;entryY=0.19;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-api" target="lane-maui" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m19" value="19. Клик Добави дърво" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.20;entryX=0;entryY=0.20;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-user" target="lane-maui" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m20" value="20. IsLoggedInAsync()" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.21;entryX=0;entryY=0.21;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-maui" target="lane-authsvc" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m21" value="21. true / false" style="endArrow=open;endFill=0;html=1;dashed=1;exitX=0;exitY=0.22;entryX=1;entryY=0.22;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-authsvc" target="lane-maui" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m22" value="22. GetDivisionsAsync(), CreateTreeAsync(tree)" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.23;entryX=0;entryY=0.23;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-maui" target="lane-api" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m23" value="23. GET api/divisions, ... POST api/trees [Bearer]" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.24;entryX=0;entryY=0.24;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-api" target="lane-data" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m24" value="24. 201 → Успех" style="endArrow=open;endFill=0;html=1;dashed=1;exitX=0;exitY=0.25;entryX=1;entryY=0.25;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-data" target="lane-api" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m25" value="25. Клик Изход" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.26;entryX=0;entryY=0.26;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-user" target="lane-maui" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m26" value="26. RemoveTokenAsync()" style="endArrow=blockThin;endFill=1;html=1;rounded=0;exitX=1;exitY=0.27;entryX=0;entryY=0.27;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-maui" target="lane-authsvc" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="m27" value="27. Показва Вход" style="endArrow=open;endFill=0;html=1;dashed=1;exitX=0;exitY=0.28;entryX=1;entryY=0.28;fontSize=10;verticalAlign=middle;align=center;" parent="1" source="lane-maui" target="lane-user" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

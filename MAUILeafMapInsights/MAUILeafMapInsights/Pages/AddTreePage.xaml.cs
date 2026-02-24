@@ -3,7 +3,7 @@ using MAUILeafMapInsights.Services;
 
 namespace MAUILeafMapInsights.Pages;
 
-/// <summary>Форма за добавяне на ново дърво. Зарежда референтни списъци (Division, Species и др.) за Picker-и и изпраща POST api/trees.</summary>
+/// <summary>Форма за добавяне на ново дърво. Зарежда референтни списъци (Division, Species и др.) за Picker-и, позволява добавяне на снимка (камера/галерия) и изпраща POST api/trees.</summary>
 public partial class AddTreePage : ContentPage
 {
     private LeafMapApiService? _api;
@@ -17,6 +17,9 @@ public partial class AddTreePage : ContentPage
     private Picker _genusPicker = null!;
     private Picker _speciesPicker = null!;
     private Label _errorLabel = null!;
+    private Image _photoPreview = null!;
+    private string? _photoPath;
+    private byte[]? _photoBytes;
     private List<DivisionDto> _divisions = new();
     private List<TaxonomyClassDto> _classes = new();
     private List<FamilyDto> _families = new();
@@ -47,8 +50,7 @@ public partial class AddTreePage : ContentPage
         _auth ??= AppServices.GetRequired<AuthService>();
     }
 
-    /// <summary>Създава полета и Picker-и за име, координати и таксономия и бутон Създай.</summary>
-    /// <summary>Създава полета и Picker-и за формата и бутон Създай.</summary>
+    /// <summary>Създава полета и Picker-и за формата, преглед на снимка, бутони за снимка и Създай.</summary>
     private void BuildForm()
     {
         _nameEntry = new Entry { Placeholder = "Име *" };
@@ -61,10 +63,27 @@ public partial class AddTreePage : ContentPage
         _speciesPicker = new Picker { Title = "Вид" };
         _errorLabel = new Label { TextColor = Colors.Red, IsVisible = false };
 
+        _photoPreview = new Image
+        {
+            HeightRequest = 160,
+            WidthRequest = 160,
+            BackgroundColor = Colors.LightGray,
+            Aspect = Aspect.AspectFill
+        };
+        var photoLabel = new Label { Text = "Снимка на дървото", FontAttributes = FontAttributes.Bold };
+        var takePhotoBtn = new Button { Text = "Вземи снимка" };
+        takePhotoBtn.Clicked += OnTakePhotoClicked;
+        var pickPhotoBtn = new Button { Text = "Избери снимка от галерията", BackgroundColor = Colors.Transparent, TextColor = Color.FromArgb("#512BD4") };
+        pickPhotoBtn.Clicked += OnPickPhotoClicked;
+
         FormStack.Children.Add(new Label { Text = "Добави дърво", FontSize = 22 });
         FormStack.Children.Add(_nameEntry);
         FormStack.Children.Add(_latEntry);
         FormStack.Children.Add(_lngEntry);
+        FormStack.Children.Add(photoLabel);
+        FormStack.Children.Add(_photoPreview);
+        FormStack.Children.Add(takePhotoBtn);
+        FormStack.Children.Add(pickPhotoBtn);
         FormStack.Children.Add(_divisionPicker);
         FormStack.Children.Add(_classPicker);
         FormStack.Children.Add(_familyPicker);
@@ -74,6 +93,57 @@ public partial class AddTreePage : ContentPage
         var submitBtn = new Button { Text = "Създай" };
         submitBtn.Clicked += OnSubmitClicked;
         FormStack.Children.Add(submitBtn);
+    }
+
+    private async void OnTakePhotoClicked(object sender, EventArgs e)
+    {
+        try
+        {
+            if (!MediaPicker.Default.IsCaptureSupported)
+            {
+                _errorLabel.Text = "Камерата не се поддържа на това устройство.";
+                _errorLabel.IsVisible = true;
+                return;
+            }
+            var photo = await MediaPicker.Default.CapturePhotoAsync();
+            if (photo != null)
+                await SetPhotoFromFile(photo.FullPath);
+        }
+        catch (Exception ex)
+        {
+            _errorLabel.Text = "Грешка при заснемане: " + ex.Message;
+            _errorLabel.IsVisible = true;
+        }
+    }
+
+    private async void OnPickPhotoClicked(object sender, EventArgs e)
+    {
+        try
+        {
+            var photo = await MediaPicker.Default.PickPhotoAsync();
+            if (photo != null)
+                await SetPhotoFromFile(photo.FullPath);
+        }
+        catch (Exception ex)
+        {
+            _errorLabel.Text = "Грешка при избор на снимка: " + ex.Message;
+            _errorLabel.IsVisible = true;
+        }
+    }
+
+    private async Task SetPhotoFromFile(string path)
+    {
+        _photoPath = path;
+        _photoPreview.Source = path;
+        _errorLabel.IsVisible = false;
+        try
+        {
+            _photoBytes = await File.ReadAllBytesAsync(path);
+        }
+        catch
+        {
+            _photoBytes = null;
+        }
     }
 
     /// <summary>Зарежда референтни списъци от API и попълва Picker-ите.</summary>
@@ -117,9 +187,14 @@ public partial class AddTreePage : ContentPage
             return;
         }
 
+        string? photoUrl = null;
+        if (_photoBytes != null && _photoBytes.Length > 0)
+            photoUrl = "data:image/jpeg;base64," + Convert.ToBase64String(_photoBytes);
+
         var tree = new TreeDto
         {
             Name = _nameEntry.Text!.Trim(),
+            PhotoURL = photoUrl,
             Latitude = double.TryParse(_latEntry.Text, out var lat) ? lat : 42.6977,
             Longitude = double.TryParse(_lngEntry.Text, out var lng) ? lng : 23.3219,
             DivisionId = _divisionPicker.SelectedIndex >= 0 && _divisionPicker.SelectedIndex < _divisions.Count ? _divisions[_divisionPicker.SelectedIndex].Id : 1,

@@ -26,6 +26,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Приложението използва камерата за заснемане на снимка към дърво.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Приложението използва галерията за избор на снимка към дърво.</string>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
 </dict>

@@ -13,10 +13,13 @@
     <FlyoutItem Title="Дървета" Icon="dotnet_bot.png">
         <ShellContent Route="Trees" ContentTemplate="{DataTemplate pages:TreesPage}" />
     </FlyoutItem>
+    <FlyoutItem Title="Карта" Icon="dotnet_bot.png">
+        <ShellContent Route="Map" ContentTemplate="{DataTemplate pages:MapPage}" />
+    </FlyoutItem>
     <FlyoutItem Title="Таксономия" Icon="dotnet_bot.png">
         <ShellContent Route="Taxonomy" ContentTemplate="{DataTemplate pages:TaxonomyPage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Вход" Icon="dotnet_bot.png">
+    <FlyoutItem x:Name="AuthFlyoutItem" Title="Вход" Icon="dotnet_bot.png">
         <ShellContent Route="Login" ContentTemplate="{DataTemplate pages:LoginPage}" />
     </FlyoutItem>
 

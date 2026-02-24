@@ -699,6 +699,22 @@ body::before {
   font-size: 0.8rem;
 }
 
+/* Карта */
+.map-container {
+  position: relative;
+  margin-top: 0.5rem;
+}
+.map-view {
+  width: 100%;
+  min-height: 400px;
+  height: 60vh;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+.map-view .leaflet-popup-content a {
+  color: var(--accent-light);
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .nav-auth {

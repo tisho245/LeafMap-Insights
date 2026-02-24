@@ -18,14 +18,18 @@ public partial class HomePage : ContentPage
         _auth ??= AppServices.GetRequired<AuthService>();
     }
 
-    /// <summary>При появяване обновяваме текста на бутона за вход – "Вход" или "Изход" според наличието на токен.</summary>
+    /// <summary>При появяване обновяваме текста на бутона за вход и заглавието в flyout менюто.</summary>
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        AuthButton.Text = await (_auth ?? AppServices.GetRequired<AuthService>()).IsLoggedInAsync() ? "Изход" : "Вход";
+        var auth = _auth ?? AppServices.GetRequired<AuthService>();
+        AuthButton.Text = await auth.IsLoggedInAsync() ? "Изход" : "Вход";
+        if (Shell.Current is AppShell shell)
+            shell.UpdateAuthFlyoutTitleAsync();
     }
 
     private async void OnTreesClicked(object sender, EventArgs e) => await Shell.Current.GoToAsync("//Trees");
+    private async void OnMapClicked(object sender, EventArgs e) => await Shell.Current.GoToAsync("//Map");
     private async void OnTaxonomyClicked(object sender, EventArgs e) => await Shell.Current.GoToAsync("//Taxonomy");
 
     private async void OnAddTreeClicked(object sender, EventArgs e)
@@ -45,8 +49,10 @@ public partial class HomePage : ContentPage
         var auth = _auth ?? AppServices.GetRequired<AuthService>();
         if (await auth.IsLoggedInAsync())
         {
-            auth.RemoveTokenAsync();
+            await auth.RemoveTokenAsync();
             AuthButton.Text = "Вход";
+            if (Shell.Current is AppShell shell)
+                shell.UpdateAuthFlyoutTitleAsync();
         }
         else
             await Shell.Current.GoToAsync("//Login");

@@ -27,8 +27,7 @@ docker-compose restart dataapi authapi
 |------------|------------------------|-----------------------------|
 | Data API   | http://localhost:5202  | Дървета, таксономия         |
 | Auth API   | http://localhost:5203  | Вход, регистрация           |
-| MVC        | http://localhost:5000  | ASP.NET MVC уеб клиент      |
-| Node client| http://localhost:3000  | Node.js уеб клиент          |
+| Node client| http://localhost:3000  | Node.js уеб сайт (апликация за сайт) |
 | Static web | http://localhost:8080  | Статичен HTML/JS клиент     |
 | SQL Server | localhost:1433         | База данни (вътрешна)       |
 
@@ -59,4 +58,4 @@ docker-compose down -v
 docker-compose up -d sqlserver dataapi authapi
 ```
 
-След това отваряйте MVC/Node/Static от хоста към съответните портове.
+След това отваряйте Node/Static от хоста към съответните портове.

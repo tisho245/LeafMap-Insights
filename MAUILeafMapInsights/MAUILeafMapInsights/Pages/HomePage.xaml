@@ -8,6 +8,7 @@
             <Label Text="LeafMap Insights" FontSize="28" FontAttributes="Bold" HorizontalOptions="Center" />
             <Label Text="Каталогизиране на дървета" TextColor="Gray" HorizontalOptions="Center" />
             <Button Text="Дървета" Clicked="OnTreesClicked" />
+            <Button Text="Карта" Clicked="OnMapClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
             <Button Text="Таксономия" Clicked="OnTaxonomyClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
             <Button Text="Добави дърво" Clicked="OnAddTreeClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
             <Button x:Name="AuthButton" Text="Вход" Clicked="OnAuthClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />

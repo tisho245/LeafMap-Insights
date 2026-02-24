@@ -1,0 +1,61 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" version="29.5.2">
+  <diagram name="Use Case - Apps" id="NWZOwAoHJlRddKiGs7L3">
+    <mxGraphModel dx="2108" dy="527" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="DlUn10L1fDLyetAq-MrH-1" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" value="LeafMap Insights екосистема" vertex="1">
+          <mxGeometry height="24" width="860" x="-80" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=11;align=center;verticalAlign=top;spacingTop=8;" value="Node.js сайт&#xa;(LeafMapInsightsNodeClient)" vertex="1">
+          <mxGeometry height="370" width="240" x="-20" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-12" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" value="Вход" vertex="1">
+          <mxGeometry height="36" width="100" x="50" y="189" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-13" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" value="Регистрация" vertex="1">
+          <mxGeometry height="36" width="100" x="50" y="233" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-14" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" value="Списък дървета" vertex="1">
+          <mxGeometry height="36" width="100" x="50" y="277" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-15" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" value="Детайли дърво" vertex="1">
+          <mxGeometry height="36" width="100" x="50" y="319" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-16" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" value="Добавяне на дърво" vertex="1">
+          <mxGeometry height="36" width="100" x="50" y="361" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-17" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" value="Карта" vertex="1">
+          <mxGeometry height="36" width="100" x="50" y="405" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-18" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" value="Таксономия / Изход" vertex="1">
+          <mxGeometry height="36" width="100" x="50" y="449" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-19" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=11;align=center;verticalAlign=top;spacingTop=8;" value="MAUILeafMapInsights&#xa;(мобилно/десктоп)" vertex="1">
+          <mxGeometry height="390" width="260" x="410" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-20" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" value="Вход" vertex="1">
+          <mxGeometry height="36" width="120" x="480" y="193" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-21" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" value="Регистрация" vertex="1">
+          <mxGeometry height="36" width="120" x="480" y="238" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-22" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" value="Списък дървета" vertex="1">
+          <mxGeometry height="36" width="120" x="480" y="283" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-23" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" value="Детайли дърво" vertex="1">
+          <mxGeometry height="36" width="120" x="480" y="328" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-24" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" value="Добавяне на дърво&#xa;+ снимка (камера/галерия)" vertex="1">
+          <mxGeometry height="44" width="160" x="460" y="373" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-25" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" value="Таксономия / Изход" vertex="1">
+          <mxGeometry height="36" width="120" x="480" y="474" as="geometry" />
+        </mxCell>
+        <mxCell id="DlUn10L1fDLyetAq-MrH-34" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" value="Карта" vertex="1">
+          <mxGeometry height="36" width="120" x="480" y="428" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

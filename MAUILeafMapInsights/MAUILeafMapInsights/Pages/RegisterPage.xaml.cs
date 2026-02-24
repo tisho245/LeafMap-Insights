@@ -42,6 +42,8 @@ public partial class RegisterPage : ContentPage
         }
 
         await _auth!.SetTokenAsync(resp.Token);
+        if (Shell.Current is AppShell shell)
+            shell.UpdateAuthFlyoutTitleAsync();
         await Shell.Current.GoToAsync("//Trees");
     }
 

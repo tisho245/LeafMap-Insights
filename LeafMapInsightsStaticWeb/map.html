@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Детайли за дърво — LeafMap Insights</title>
+  <title>Карта — LeafMap Insights</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body data-page="tree-detail">
+<body data-page="map">
   <header class="header">
     <div class="header-inner">
       <h1 class="logo"><a href="index.html" class="logo-link">LeafMap Insights</a></h1>
@@ -30,15 +30,19 @@
   </header>
 
   <main class="main">
-    <a href="trees.html" class="btn btn-ghost back-btn">← Назад към списъка</a>
-    <div id="treeDetailContent" class="tree-detail"></div>
-    <div id="treeDetailLoading" class="loading">Зареждане...</div>
-    <div id="treeDetailError" class="error-msg" hidden></div>
+    <h2 class="view-title">Карта</h2>
+    <div id="mapContainer" class="map-container">
+      <div id="mapLoading" class="loading">Зареждане на карта...</div>
+      <div id="mapError" class="error-msg" hidden></div>
+      <div id="map" class="map-view"></div>
+    </div>
   </main>
 
   <footer class="footer">
     <p>LeafMap Insights — API клиент.</p>
   </footer>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/axios@1.6/dist/axios.min.js"></script>
   <script src="app.js"></script>
 </body>

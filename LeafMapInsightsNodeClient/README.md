@@ -1,6 +1,6 @@
-# LeafMap Insights – Node.js клиент
+# LeafMap Insights – Node.js уеб сайт (апликация за сайт)
 
-Уеб клиент за LeafMap Insights API, обслужван от Express. API адресът се задава в `.env` и се подава на браузъра чрез `/api-config`.
+Това е **уеб сайтът** за LeafMap Insights: Express сървър обслужва страниците и подава API адресите от `.env` на браузъра чрез `/api-config`. Браузърът комуникира директно с Auth API и Data API; JWT се пази в localStorage.
 
 ## Изисквания
 

@@ -299,6 +299,62 @@ async function loadTrees() {
   }
 }
 
+// ---------- Карта (Leaflet) ----------
+async function initMap() {
+  const mapEl = document.getElementById('map');
+  const loadingEl = document.getElementById('mapLoading');
+  const errorEl = document.getElementById('mapError');
+  if (!mapEl || typeof L === 'undefined') return;
+
+  if (loadingEl) loadingEl.hidden = false;
+  if (errorEl) errorEl.hidden = true;
+
+  try {
+    const data = await api('api/trees?includeLookups=true');
+    const trees = Array.isArray(data) ? data : (data && data.data ? data.data : null);
+    if (!Array.isArray(trees) || !trees.length) {
+      if (loadingEl) loadingEl.hidden = true;
+      mapEl.innerHTML = '<p class="empty">Няма дървета за показване на картата.</p>';
+      return;
+    }
+
+    const valid = trees.filter(t => t.latitude != null && t.longitude != null);
+    if (!valid.length) {
+      if (loadingEl) loadingEl.hidden = true;
+      mapEl.innerHTML = '<p class="empty">Няма дървета с координати.</p>';
+      return;
+    }
+
+    if (loadingEl) loadingEl.hidden = true;
+    mapEl.innerHTML = '';
+
+    const center = [valid[0].latitude, valid[0].longitude];
+    const map = L.map(mapEl).setView(center, 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    const bounds = L.latLngBounds(valid.map(t => [t.latitude, t.longitude]));
+    valid.forEach(tree => {
+      const marker = L.marker([tree.latitude, tree.longitude])
+        .addTo(map)
+        .bindPopup(
+          '<strong>' + escapeHtml(tree.name || 'Дърво #' + tree.id) + '</strong><br>' +
+          (tree.species?.name ? escapeHtml(tree.species.name) : '') +
+          ' <a href="tree.html?id=' + tree.id + '">Детайли</a>'
+        );
+    });
+    map.fitBounds(bounds, { padding: [20, 20], maxZoom: 15 });
+  } catch (e) {
+    if (loadingEl) loadingEl.hidden = true;
+    if (errorEl) {
+      errorEl.textContent = e.message || 'Грешка при зареждане на картата.';
+      errorEl.innerHTML = errorEl.textContent + ' <a href="index.html">Задайте адрес на API на началната страница</a>.';
+      errorEl.hidden = false;
+    }
+  }
+}
+
 async function loadTreeDetail(id) {
   const contentEl = document.getElementById('treeDetailContent');
   const loadingEl = document.getElementById('treeDetailLoading');
@@ -452,6 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (document.getElementById('apiStatus')) checkApiStatus();
   if (document.getElementById('treesList')) loadTrees();
+  if (document.getElementById('map')) initMap();
   if (document.getElementById('taxDivisions')) loadTaxonomy();
   if (document.getElementById('treeDetailContent')) {
     const params = new URLSearchParams(window.location.search);
