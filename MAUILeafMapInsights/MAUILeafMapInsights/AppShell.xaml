@@ -19,6 +19,9 @@
     <FlyoutItem Title="Таксономия" Icon="dotnet_bot.png">
         <ShellContent Route="Taxonomy" ContentTemplate="{DataTemplate pages:TaxonomyPage}" />
     </FlyoutItem>
+    <FlyoutItem x:Name="AdminFlyoutItem" Title="Админ" Icon="dotnet_bot.png" IsVisible="False">
+        <ShellContent Route="Admin" ContentTemplate="{DataTemplate pages:AdminPage}" />
+    </FlyoutItem>
     <FlyoutItem x:Name="AuthFlyoutItem" Title="Вход" Icon="dotnet_bot.png">
         <ShellContent Route="Login" ContentTemplate="{DataTemplate pages:LoginPage}" />
     </FlyoutItem>

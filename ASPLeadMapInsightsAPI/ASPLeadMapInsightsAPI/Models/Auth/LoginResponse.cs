@@ -6,4 +6,7 @@ public class LoginResponse
     public string Token { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public DateTime ExpiresAt { get; set; }
+
+    /// <summary>Ролите на потребителя към момента на издаване на токена (напр. User, Admin).</summary>
+    public List<string> Roles { get; set; } = new();
 }

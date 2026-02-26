@@ -1,0 +1,214 @@
+' =============================================================================
+' LeafMap Insights – Sequence диаграми (PlantUML)
+' Node.js клиент, Auth API, Data API, MAUI приложение
+' =============================================================================
+
+@startuml Node.js_LeafMapInsightsNodeClient
+title LeafMapInsightsNodeClient (Node.js уеб сайт, роли User/Admin)
+
+actor User as Потребител
+actor Admin as Администратор
+participant Browser as "Браузър\n(app.js)"
+participant Node as "Node сървър\n(Express)"
+participant AuthAPI as "Auth API"
+participant DataAPI as "Data API"
+
+== Конфигурация при зареждане ==
+Browser -> Node: GET /api-config
+Node --> Browser: { apiBaseUrl, authApiBaseUrl }
+Browser -> DataAPI: GET api/divisions (проверка на API)
+DataAPI --> Browser: 200 OK / грешка
+
+== Вход / Регистрация (User или Admin) ==
+User -> Browser: Login / Register
+Browser -> AuthAPI: POST api/auth/login|register { email, password, userName? }
+AuthAPI --> Browser: { token, email, expiresAt, roles=[User|Admin] }
+Browser -> Browser: setToken() → localStorage
+Browser -> Browser: updateAuthUI() (показва линк „Админ“ ако roles съдържа Admin)
+
+== Обикновен потребител (User) – дървета и таксономия (четене) ==
+User -> Browser: Навигация (trees, tree, taxonomy, add-tree)
+Browser -> DataAPI: GET api/trees, api/trees/{id}, api/divisions, ... [Bearer optional]
+DataAPI --> Browser: JSON
+Browser -> User: Рендира страници
+
+== User – добавяне на дърво ==
+User -> Browser: Попълва форма „Добави дърво“
+Browser -> DataAPI: GET api/divisions,... (dropdown-и)
+DataAPI --> Browser: списъци
+Browser -> DataAPI: POST api/trees { name, latitude, ... } [Bearer User/Admin]
+DataAPI --> Browser: 201 Created
+Browser -> User: Успех
+
+== Admin – управление на потребители и таксономия ==
+Admin -> Browser: Отваря admin.html
+Browser -> AuthAPI: GET api/users [Authorization: Bearer Admin]
+AuthAPI --> Browser: [ { id, email, roles[] }, ... ]
+Browser -> Admin: Показва списък потребители
+
+Admin -> Browser: CRUD таксономия
+Browser -> DataAPI: POST/PUT/DELETE api/divisions|taxonomyclasses|families|genera|species [Bearer Admin]
+DataAPI --> Browser: 201/204/...
+
+== Изход ==
+User -> Browser: Изход
+Browser -> Browser: removeItem(TOKEN_KEY)
+@enduml
+
+@startuml API_Authentication_Flow
+title Auth API – Вход и регистрация
+
+actor Client as Клиент\n(Static/Node/MAUI)
+participant AuthAPI as "Auth API\n(LeafMap Insights Auth)"
+
+== Вход (Login) ==
+Client -> AuthAPI: POST api/auth/login\n{ "email", "password" }
+AuthAPI --> Client: 200 OK\n{ token, email, expiresAt }
+
+== Регистрация (Register) ==
+Client -> AuthAPI: POST api/auth/register\n{ "email", "password", "userName"? }
+AuthAPI --> Client: 200 OK\n{ token, email, expiresAt }
+
+== Грешка (напр. невалидни данни) ==
+Client -> AuthAPI: POST api/auth/login (невалидни данни)
+AuthAPI --> Client: 401 / 400\n{ message, ... }
+@enduml
+
+@startuml API_Data_Flow
+title Data API – Дървета и таксономия (роли User/Admin)
+
+actor User as КлиентUser\n(Static/Node/MAUI)
+actor Admin as КлиентAdmin\n(Static/Node/MAUI)
+participant DataAPI as "Data API\n(ASPLeadMapInsightsAPI)"
+database Db as База данни
+
+== Проверка на връзка и публично четене ==
+User -> DataAPI: GET api/divisions
+DataAPI -> Db: SELECT Divisions
+Db --> DataAPI: divisions
+DataAPI --> User: 200 OK [ { id, name }, ... ]
+
+== Дървета – четене (User/Admin) ==
+User -> DataAPI: GET api/trees?includeLookups=true [Bearer optional]
+DataAPI -> Db: SELECT Trees (+ lookups)
+Db --> DataAPI: данни
+DataAPI --> User: 200 OK [ TreeDto, ... ]
+
+User -> DataAPI: GET api/trees/{id}?includeLookups=true [Bearer optional]
+DataAPI -> Db: SELECT Tree by Id
+Db --> DataAPI: tree
+DataAPI --> User: 200 OK TreeDto
+
+== Дървета – CRUD (всеки логнат) ==
+User -> DataAPI: POST api/trees { ... } [Bearer User]
+DataAPI -> DataAPI: валидира JWT
+DataAPI -> Db: INSERT Tree
+Db --> DataAPI: OK
+DataAPI --> User: 201 Created
+
+User -> DataAPI: PUT/DELETE api/trees/{id} [Bearer User]
+DataAPI -> Db: UPDATE/DELETE Tree
+Db --> DataAPI: OK
+DataAPI --> User: 204 NoContent
+
+== Таксономия – CRUD само за Admin ==
+Admin -> DataAPI: POST/PUT/DELETE api/divisions|taxonomyclasses|families|genera|species [Bearer Admin]
+DataAPI -> DataAPI: валидира JWT и роля Admin
+DataAPI -> Db: INSERT/UPDATE/DELETE lookups
+Db --> DataAPI: OK
+DataAPI --> Admin: 201/204
+
+User -> DataAPI: POST/PUT/DELETE api/divisions|... [Bearer User]
+DataAPI --> User: 403 Forbidden (липсва роля Admin)
+
+@enduml
+
+@startuml MAUI_LeafMapInsights
+title MAUILeafMapInsights (User/Admin, Admin flyout)
+
+actor User as Потребител
+actor Admin as Администратор
+participant MAUI as "MAUI App"
+participant AuthService as "AuthService\n(SecureStorage + Roles)"
+participant LeafMapApi as "LeafMapApiService\n(HttpClient)"
+participant AuthAPI as "Auth API"
+participant DataAPI as "Data API"
+
+== Начална страница (HomePage) ==
+User -> MAUI: Отваря приложението
+MAUI -> AuthService: GetTokenAsync()
+AuthService --> MAUI: token / null
+MAUI -> User: Показва \"Вход\" или \"Изход\"; AdminFlyoutItem.IsVisible според IsAdminAsync()
+
+== Вход / Регистрация (User или Admin) ==
+User -> MAUI: LoginPage / RegisterPage
+MAUI -> LeafMapApi: LoginAsync / RegisterAsync
+LeafMapApi -> AuthAPI: POST api/auth/login|register { email, password, userName? }
+AuthAPI --> LeafMapApi: { token, email, expiresAt, roles=[User|Admin] }
+LeafMapApi --> MAUI: LoginResponse
+MAUI -> AuthService: SetTokenAsync(token), SetRoles(roles)
+MAUI --> User: GoToAsync(\"//Trees\"), AdminFlyoutItem.IsVisible = roles съдържа Admin
+
+== Обикновен потребител – дървета и таксономия (четене) ==
+User -> MAUI: Trees / TreeDetail / Taxonomy
+MAUI -> LeafMapApi: GetTreesAsync(), GetTreeAsync(id), GetDivisionsAsync(), ...
+LeafMapApi -> AuthService: GetTokenAsync()
+AuthService --> LeafMapApi: token (може да е null за публично четене)
+LeafMapApi -> DataAPI: GET api/trees..., api/divisions... [Bearer optional]
+DataAPI --> LeafMapApi: данни
+LeafMapApi --> MAUI: DTO
+MAUI --> User: UI
+
+== User – добавяне на дърво ==
+User -> MAUI: \"Добави дърво\"
+MAUI -> AuthService: IsLoggedInAsync()
+alt не е логнат
+    MAUI --> User: GoToAsync(\"//Login\")
+else логнат
+    MAUI -> LeafMapApi: GetDivisionsAsync(), GetTaxonomyClassesAsync(), GetGeneraAsync(), GetFamiliesAsync(), GetSpeciesAsync()
+    LeafMapApi -> DataAPI: GET api/divisions, api/taxonomyclasses, ... [Bearer]
+    DataAPI --> LeafMapApi: списъци
+    LeafMapApi --> MAUI: данни за Picker-и
+    User -> MAUI: Попълва форма и Submit
+    MAUI -> LeafMapApi: CreateTreeAsync(tree)
+    LeafMapApi -> DataAPI: POST api/trees { name, latitude, ... } [Bearer User/Admin]
+    DataAPI --> LeafMapApi: 201
+    LeafMapApi --> MAUI: true
+    MAUI --> User: Успех / навигация назад
+end
+
+== Admin – потребители ==
+Admin -> MAUI: Избира AdminFlyoutItem → AdminPage
+MAUI -> LeafMapApi: GetUsersAsync()
+LeafMapApi -> AuthService: GetTokenAsync()
+AuthService --> LeafMapApi: token (Admin)
+LeafMapApi -> AuthAPI: GET api/users [Bearer Admin]
+AuthAPI --> LeafMapApi: [ { id, email, roles[] }, ... ]
+LeafMapApi --> MAUI: списък
+MAUI --> Admin: Показва потребители (CRUD екраните могат да ползват същия Auth API)
+
+@enduml
+
+@startuml Overview_All_Clients
+title Обзор – всички клиенти и API-та
+
+participant "Static Web\n(Браузър)" as Static
+participant "Node.js сайт\n(Браузър + Express)" as Node
+participant "MAUI App" as MAUI
+participant "Auth API" as AuthAPI
+participant "Data API" as DataAPI
+
+Static -> AuthAPI: POST api/auth/login | register
+AuthAPI --> Static: token
+Static -> DataAPI: GET/POST api/trees, api/divisions, ... [Bearer]
+
+Node -> Node: GET /api-config → apiBaseUrl, authApiBaseUrl
+Node -> AuthAPI: (браузър директно) login | register
+AuthAPI --> Node: token
+Node -> DataAPI: (браузър директно) trees, divisions, ... [Bearer]
+
+MAUI -> AuthAPI: LoginAsync / RegisterAsync
+AuthAPI --> MAUI: token → SecureStorage
+MAUI -> DataAPI: GetTreesAsync, CreateTreeAsync, ... [Bearer]
+DataAPI --> MAUI: DTO
+@enduml

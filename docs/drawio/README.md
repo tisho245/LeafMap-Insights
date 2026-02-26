@@ -23,6 +23,7 @@ Sequence и use case диаграмите са в **draw.io (diagrams.net)** XML
 | `LeafMapInsightsNodeClient-sequence.drawio` | Node.js уеб сайт |
 | `MAUILeafMapInsights-sequence.drawio` | MAUI приложение |
 | `LeafMapInsights-use-case.drawio` | Use case – през коя апликация какво можем да правим |
+| **`LeafMapInsights-component-overview.drawio`** | **Компонентни диаграми** – 5 страници: обзор на системата, Auth API, Data API, Node.js клиент, MAUI клиент |
 
 ## Как да отворите
 

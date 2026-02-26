@@ -27,7 +27,7 @@ public class GeneraController : ControllerBase
     }
 
     /// <summary>Добавя нов род.</summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<Genus>> Create([FromBody] Genus genus)
     {
@@ -37,7 +37,7 @@ public class GeneraController : ControllerBase
     }
 
     /// <summary>Обновява род по Id.</summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] Genus genus)
     {
@@ -56,7 +56,7 @@ public class GeneraController : ControllerBase
     }
 
     /// <summary>Изтрива род по Id.</summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

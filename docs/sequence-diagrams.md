@@ -2,6 +2,8 @@
 
 Този документ съдържа sequence диаграми за трите клиентски приложения, които комуникират с **LeafMap Insights Auth API** и **LeafMap Insights Data API**. За обзор **през коя апликация какво можем да правим** вижте [use-case-diagram.md](use-case-diagram.md).
 
+**PlantUML версия:** Всички диаграми са налични и като PlantUML в [sequence-diagrams.puml](sequence-diagrams.puml) (Node.js, Auth API, Data API, MAUI + обзор).
+
 ---
 
 ## 1. LeafMapInsightsStaticWeb (статичен HTML/JS клиент)

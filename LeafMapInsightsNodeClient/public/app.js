@@ -68,7 +68,7 @@ async function api(endpoint, options = {}) {
   }
 }
 
-/** Заявки към Auth API (login/register). */
+/** Заявки към Auth API (login/register, api/users за Admin). При наличие на токен изпраща Bearer за защитени endpoints. */
 async function authApi(endpoint, options = {}) {
   const base = getAuthApiBaseUrl();
   const url = `${base.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
@@ -76,6 +76,8 @@ async function authApi(endpoint, options = {}) {
     'Content-Type': 'application/json',
     ...options.headers
   };
+  const token = getToken();
+  if (token) headers['Authorization'] = `Bearer ${token}`;
   try {
     const res = await axios({
       url,
@@ -168,6 +170,21 @@ function setApiUrl(url) {
   checkApiStatus();
 }
 
+/** Връща ролите от JWT payload (claim role). */
+function getRolesFromToken() {
+  const token = getToken();
+  if (!token) return [];
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const role = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+    if (Array.isArray(role)) return role;
+    if (typeof role === 'string') return [role];
+    return [];
+  } catch (_) { return []; }
+}
+
+function isAdmin() { return getRolesFromToken().includes('Admin'); }
+
 function updateAuthUI() {
   const token = getToken();
   const emailEl = document.getElementById('userEmail');
@@ -175,6 +192,7 @@ function updateAuthUI() {
   const btnLogout = document.getElementById('btnLogout');
   const formAddTree = document.getElementById('formAddTree');
   const addTreeLoginRequired = document.getElementById('addTreeLoginRequired');
+  const adminLink = document.getElementById('adminLink');
 
   if (token) {
     try {
@@ -188,12 +206,14 @@ function updateAuthUI() {
     if (btnLogout) btnLogout.hidden = false;
     if (formAddTree) formAddTree.hidden = false;
     if (addTreeLoginRequired) addTreeLoginRequired.hidden = true;
+    if (adminLink) adminLink.hidden = !isAdmin();
   } else {
     if (emailEl) emailEl.textContent = '';
     if (btnLogin) btnLogin.hidden = false;
     if (btnLogout) btnLogout.hidden = true;
     if (formAddTree) formAddTree.hidden = true;
     if (addTreeLoginRequired) addTreeLoginRequired.hidden = false;
+    if (adminLink) adminLink.hidden = true;
   }
 }
 

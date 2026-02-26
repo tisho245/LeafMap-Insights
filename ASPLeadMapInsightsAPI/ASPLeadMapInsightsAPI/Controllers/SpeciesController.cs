@@ -27,7 +27,7 @@ public class SpeciesController : ControllerBase
     }
 
     /// <summary>Добавя нов вид.</summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<Species>> Create([FromBody] Species species)
     {
@@ -37,7 +37,7 @@ public class SpeciesController : ControllerBase
     }
 
     /// <summary>Обновява вид по Id.</summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] Species species)
     {
@@ -56,7 +56,7 @@ public class SpeciesController : ControllerBase
     }
 
     /// <summary>Изтрива вид по Id.</summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

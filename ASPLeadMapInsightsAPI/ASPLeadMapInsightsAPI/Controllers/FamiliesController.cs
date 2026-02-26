@@ -27,7 +27,7 @@ public class FamiliesController : ControllerBase
     }
 
     /// <summary>Добавя ново семейство.</summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<Family>> Create([FromBody] Family family)
     {
@@ -36,7 +36,7 @@ public class FamiliesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = family.Id }, family);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] Family family)
     {
@@ -56,7 +56,7 @@ public class FamiliesController : ControllerBase
 
     /// <summary>Изтрива семейство по Id.</summary>
     /// <summary>Изтрива семейство по Id.</summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

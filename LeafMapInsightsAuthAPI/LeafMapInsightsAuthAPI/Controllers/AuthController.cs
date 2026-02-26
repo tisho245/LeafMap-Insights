@@ -34,7 +34,12 @@ public class AuthController : ControllerBase
         if (!result.Succeeded)
             return BadRequest(result.Errors.Select(e => e.Description));
 
-        var token = _jwtService.GenerateToken(user.Id, user.Email!);
+            // Новите акаунти по подразбиране са с роля "User".
+            var defaultRole = "User";
+            await _userManager.AddToRoleAsync(user, defaultRole);
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var token = _jwtService.GenerateToken(user.Id, user.Email!, roles);
         var expiresMinutes = int.TryParse(
             HttpContext.RequestServices.GetRequiredService<IConfiguration>()["Jwt:ExpiresMinutes"],
             out var m) ? m : 60;
@@ -42,7 +47,8 @@ public class AuthController : ControllerBase
         {
             Token = token,
             Email = user.Email!,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(expiresMinutes)
+                ExpiresAt = DateTime.UtcNow.AddMinutes(expiresMinutes),
+                Roles = roles.ToList()
         });
     }
 
@@ -66,7 +72,8 @@ public class AuthController : ControllerBase
         {
             Token = token,
             Email = user.Email!,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(expiresMinutes)
+            ExpiresAt = DateTime.UtcNow.AddMinutes(expiresMinutes),
+            Roles = roles.ToList()
         });
     }
 }

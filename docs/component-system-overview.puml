@@ -1,0 +1,22 @@
+@startuml
+title LeafMap Insights - Obzor na sistemata (komponenti)
+
+package "Backend" {
+  class "Auth API" as AuthAPI
+  class "Data API" as DataAPI
+  class "SQL Server" as DB
+  AuthAPI --> DB
+  DataAPI --> DB
+}
+
+package "Klienti" {
+  class "Node.js klient" as NodeClient
+  class "MAUI klient" as MAUIClient
+}
+
+NodeClient --> AuthAPI : HTTPS
+NodeClient --> DataAPI : HTTPS
+MAUIClient --> AuthAPI : HTTPS
+MAUIClient --> DataAPI : HTTPS
+
+@enduml

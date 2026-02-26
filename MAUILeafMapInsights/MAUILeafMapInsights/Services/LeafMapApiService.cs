@@ -121,6 +121,16 @@ public class LeafMapApiService
         return await GetAsync<List<SpeciesDto>>("api/species", ct);
     }
 
+    /// <summary>Списък потребители – изисква Admin, вика Auth API api/users.</summary>
+    public async Task<List<UserDto>?> GetUsersAsync(CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var baseAuth = ApiSettings.AuthApiBaseUrl.TrimEnd('/');
+        var res = await _http.GetAsync($"{baseAuth}/api/users", ct);
+        if (!res.IsSuccessStatusCode) return null;
+        return JsonSerializer.Deserialize<List<UserDto>>(await res.Content.ReadAsStringAsync(ct), _jsonOpt);
+    }
+
     /// <summary>Вътрешен GET помощник – десериализира JSON отговор в T.</summary>
     private async Task<T?> GetAsync<T>(string path, CancellationToken ct)
     {

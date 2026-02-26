@@ -27,7 +27,7 @@ public class TaxonomyClassesController : ControllerBase
     }
 
     /// <summary>Създава нов клас в таксономията.</summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<TaxonomyClass>> Create([FromBody] TaxonomyClass taxonomyClass)
     {
@@ -36,7 +36,7 @@ public class TaxonomyClassesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = taxonomyClass.Id }, taxonomyClass);
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] TaxonomyClass taxonomyClass)  // Обновяване по Id
     {
@@ -55,7 +55,7 @@ public class TaxonomyClassesController : ControllerBase
     }
 
     /// <summary>Изтрива запис от TaxonomyClasses.</summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

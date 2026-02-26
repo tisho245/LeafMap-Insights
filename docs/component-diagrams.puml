@@ -1,0 +1,222 @@
+@startuml Component_System_Overview
+title LeafMap Insights - Obzor na sistemata
+
+package "Backend" {
+  class "Auth API" as AuthAPI
+  class "Data API" as DataAPI
+  class "SQL Server" as DB
+  AuthAPI --> DB
+  DataAPI --> DB
+}
+
+package "Klienti" {
+  class "Node.js klient" as NodeClient
+  class "MAUI klient" as MAUIClient
+}
+
+NodeClient --> AuthAPI : HTTPS
+NodeClient --> DataAPI : HTTPS
+MAUIClient --> AuthAPI : HTTPS
+MAUIClient --> DataAPI : HTTPS
+
+@enduml
+
+@startuml Component_Auth_API
+title Auth API - vatreshni komponenti
+
+package "LeafMapInsightsAuthAPI" {
+  class "AuthController" as AuthCtrl
+  class "UsersController" as UsersCtrl
+  class "JwtService" as JwtSvc
+  class "UserManager" as UserMgr
+  class "LeafMapDbContext" as DbCtx
+}
+
+interface "POST api/auth/login" as Login
+interface "POST api/auth/register" as Register
+interface "api/users" as Users
+
+AuthCtrl .. Login
+AuthCtrl .. Register
+UsersCtrl .. Users
+
+AuthCtrl --> JwtSvc : GenerateToken
+AuthCtrl --> UserMgr
+UsersCtrl --> UserMgr
+UserMgr --> DbCtx
+
+class "SQL Server" as DB
+DbCtx --> DB
+
+@enduml
+
+@startuml Component_Data_API
+title Data API - vatreshni komponenti
+
+package "ASPLeadMapInsightsAPI" {
+  class "TreesController" as TreesCtrl
+  class "DivisionsController" as DivCtrl
+  class "TaxonomyClassesController" as TaxClassCtrl
+  class "GeneraController" as GenCtrl
+  class "FamiliesController" as FamCtrl
+  class "SpeciesController" as SpecCtrl
+  class "LeafMapDbContext" as DbCtx
+  class "SeedData" as Seed
+}
+
+interface "api/trees" as TreesAPI
+interface "api/divisions" as DivAPI
+interface "api/taxonomy" as TaxAPI
+
+TreesCtrl .. TreesAPI
+DivCtrl .. DivAPI
+TaxClassCtrl .. TaxAPI
+GenCtrl .. TaxAPI
+FamCtrl .. TaxAPI
+SpecCtrl .. TaxAPI
+
+TreesCtrl --> DbCtx
+DivCtrl --> DbCtx
+TaxClassCtrl --> DbCtx
+GenCtrl --> DbCtx
+FamCtrl --> DbCtx
+SpecCtrl --> DbCtx
+Seed --> DbCtx
+
+class "SQL Server" as DB
+DbCtx --> DB
+
+class "JWT Middleware" as JWT
+TreesCtrl .. JWT
+DivCtrl .. JWT
+TaxClassCtrl .. JWT
+
+@enduml
+
+@startuml Component_Node_Client
+title Node.js klient - komponenti
+
+package "LeafMapInsightsNodeClient" {
+  package "Server (server.js)" {
+    class "Express" as Express
+    class "GET /api-config" as ApiConfig
+    class "express.static" as Static
+  }
+  package "Klient (public)" {
+    class "app.js" as AppJS
+    class "HTML stranici" as Pages
+  }
+}
+
+class "User" as User
+User --> Pages
+Pages --> AppJS
+
+AppJS --> ApiConfig
+ApiConfig --> AppJS
+
+AppJS --> Static
+
+interface "api()" as ApiFn
+interface "authApi()" as AuthApiFn
+AppJS .. ApiFn
+AppJS .. AuthApiFn
+
+class "Auth API" as AuthAPI
+class "Data API" as DataAPI
+ApiFn --> DataAPI
+AuthApiFn --> AuthAPI
+
+class "localStorage" as LS
+AppJS --> LS
+
+@enduml
+
+@startuml Component_MAUI_Client
+title MAUI klient - komponenti
+
+package "MAUILeafMapInsights" {
+  package "Services" {
+    class "AuthService" as AuthSvc
+    class "LeafMapApiService" as ApiSvc
+    class "ApiSettings" as Settings
+  }
+  package "Pages" {
+    class "LoginPage RegisterPage" as AuthPages
+    class "HomePage TreesPage MapPage" as MainPages
+    class "AddTreePage TreeDetailPage" as TreePages
+    class "AdminPage" as AdminPage
+  }
+  class "AppShell" as Shell
+}
+
+class "User" as User
+User --> Shell
+Shell --> AuthPages
+Shell --> MainPages
+Shell --> TreePages
+Shell --> AdminPage
+
+AuthPages --> AuthSvc
+AuthPages --> ApiSvc
+MainPages --> ApiSvc
+TreePages --> ApiSvc
+AdminPage --> ApiSvc
+AdminPage --> AuthSvc
+
+ApiSvc --> AuthSvc
+ApiSvc --> Settings
+
+class "SecureStorage" as Secure
+class "Preferences" as Prefs
+AuthSvc --> Secure
+AuthSvc --> Prefs
+
+class "Auth API" as AuthAPI
+class "Data API" as DataAPI
+ApiSvc --> AuthAPI
+ApiSvc --> DataAPI
+
+@enduml
+
+@startuml Component_Deployment_Logical
+title Logichesko razpolozhenie
+
+package "Web brauzyr" {
+  class "app.js" as AppJS
+  class "HTML stranici" as HTML
+}
+
+package "Node survar" {
+  class "server.js /api-config" as Node
+}
+
+package "Auth API host" {
+  class "Controllers" as AuthCtrl
+  class "JwtService" as Jwt
+  class "LeafMapDbContext" as AuthDb
+}
+
+package "Data API host" {
+  class "Controllers" as DataCtrl
+  class "LeafMapDbContext" as DataDb
+}
+
+package "MAUI prilozhenie" {
+  class "Pages + Services" as MAUI
+}
+
+class "Baza danni" as DB
+
+AppJS --> Node
+AppJS --> AuthCtrl
+AppJS --> DataCtrl
+MAUI --> AuthCtrl
+MAUI --> DataCtrl
+AuthCtrl --> Jwt
+AuthCtrl --> AuthDb
+DataCtrl --> DataDb
+AuthDb --> DB
+DataDb --> DB
+
+@enduml

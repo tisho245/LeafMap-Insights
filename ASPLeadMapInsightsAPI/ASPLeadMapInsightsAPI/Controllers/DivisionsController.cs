@@ -29,7 +29,7 @@ public class DivisionsController : ControllerBase
     }
 
     /// <summary>Добавя нов отдел. Изисква Authorization: Bearer &lt;token&gt;.</summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult<Division>> Create([FromBody] Division division)
     {
@@ -39,7 +39,7 @@ public class DivisionsController : ControllerBase
     }
 
     /// <summary>Обновява съществуващ отдел по Id.</summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] Division division)
     {
@@ -58,7 +58,7 @@ public class DivisionsController : ControllerBase
     }
 
     /// <summary>Изтрива отдел по Id. Restrict в DbContext – ако има дървета с този DivisionId, може да има грешка.</summary>
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
