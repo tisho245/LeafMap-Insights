@@ -19,7 +19,9 @@ public class LeafMapApiService
     {
         _http = http;
         _auth = auth;
-        _http.BaseAddress = new Uri(ApiSettings.BaseUrl.TrimEnd('/'));
+        var baseUrl = (ApiSettings.BaseUrl ?? "").Trim();
+        if (string.IsNullOrEmpty(baseUrl)) baseUrl = "https://localhost:7234";
+        _http.BaseAddress = new Uri(baseUrl.TrimEnd('/'));
         _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 
@@ -35,7 +37,7 @@ public class LeafMapApiService
     /// <summary>Вход – POST към Auth API (api/auth/login). При успех връща LoginResponse с Token.</summary>
     public async Task<LoginResponse?> LoginAsync(string email, string password, CancellationToken ct = default)
     {
-        var baseAuth = ApiSettings.AuthApiBaseUrl.TrimEnd('/');
+        var baseAuth = (ApiSettings.AuthApiBaseUrl ?? "https://localhost:7240").Trim().TrimEnd('/');
         var body = JsonSerializer.Serialize(new LoginRequest { Email = email, Password = password });
         var content = new StringContent(body, Encoding.UTF8, "application/json");
         var res = await _http.PostAsync($"{baseAuth}/api/auth/login", content, ct);
@@ -46,7 +48,7 @@ public class LeafMapApiService
     /// <summary>Регистрация – POST към Auth API (api/auth/register). При успех връща LoginResponse с Token.</summary>
     public async Task<LoginResponse?> RegisterAsync(string email, string password, string? userName, CancellationToken ct = default)
     {
-        var baseAuth = ApiSettings.AuthApiBaseUrl.TrimEnd('/');
+        var baseAuth = (ApiSettings.AuthApiBaseUrl ?? "https://localhost:7240").Trim().TrimEnd('/');
         var body = JsonSerializer.Serialize(new RegisterRequest { Email = email, Password = password, UserName = userName });
         var content = new StringContent(body, Encoding.UTF8, "application/json");
         var res = await _http.PostAsync($"{baseAuth}/api/auth/register", content, ct);
@@ -125,7 +127,7 @@ public class LeafMapApiService
     public async Task<List<UserDto>?> GetUsersAsync(CancellationToken ct = default)
     {
         await EnsureTokenAsync();
-        var baseAuth = ApiSettings.AuthApiBaseUrl.TrimEnd('/');
+        var baseAuth = (ApiSettings.AuthApiBaseUrl ?? "https://localhost:7240").Trim().TrimEnd('/');
         var res = await _http.GetAsync($"{baseAuth}/api/users", ct);
         if (!res.IsSuccessStatusCode) return null;
         return JsonSerializer.Deserialize<List<UserDto>>(await res.Content.ReadAsStringAsync(ct), _jsonOpt);

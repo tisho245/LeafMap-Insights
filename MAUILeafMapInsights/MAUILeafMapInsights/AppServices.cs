@@ -11,5 +11,6 @@ public static class AppServices
     public static IServiceProvider? Services { get; set; }
 
     public static T? Get<T>() where T : class => Services?.GetService<T>();
-    public static T GetRequired<T>() where T : class => (Services?.GetRequiredService<T>()) ?? throw new InvalidOperationException("Services not set or type not registered.");
+    public static T GetRequired<T>() where T : class => (Services?.GetRequiredService<T>()) ?? throw new InvalidOperationException(
+        Services == null ? "AppServices.Services is null. Ensure MauiProgram sets AppServices.Services = app.Services after Build()." : $"Type {typeof(T).Name} is not registered in DI.");
 }

@@ -12,7 +12,17 @@ public class AuthService
     private const string TokenKey = "LeafMapJwtToken";
     private const string RolesKey = "LeafMapRoles";
 
-    public async Task<string?> GetTokenAsync() => await SecureStorage.Default.GetAsync(TokenKey);
+    public async Task<string?> GetTokenAsync()
+    {
+        try
+        {
+            return await SecureStorage.Default.GetAsync(TokenKey);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
 
     public async Task SetTokenAsync(string token) => await SecureStorage.Default.SetAsync(TokenKey, token);
 

@@ -95,7 +95,7 @@ public partial class AddTreePage : ContentPage
         FormStack.Children.Add(submitBtn);
     }
 
-    private async void OnTakePhotoClicked(object sender, EventArgs e)
+    private async void OnTakePhotoClicked(object? sender, EventArgs e)
     {
         try
         {
@@ -116,7 +116,7 @@ public partial class AddTreePage : ContentPage
         }
     }
 
-    private async void OnPickPhotoClicked(object sender, EventArgs e)
+    private async void OnPickPhotoClicked(object? sender, EventArgs e)
     {
         try
         {
@@ -169,7 +169,7 @@ public partial class AddTreePage : ContentPage
     }
 
     /// <summary>Валидира формата, проверява дали потребителят е логнат, съставя TreeDto и вика CreateTreeAsync.</summary>
-    private async void OnSubmitClicked(object sender, EventArgs e)
+    private async void OnSubmitClicked(object? sender, EventArgs e)
     {
         _errorLabel.IsVisible = false;
         if (string.IsNullOrWhiteSpace(_nameEntry.Text))

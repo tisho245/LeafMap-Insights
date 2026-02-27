@@ -16,16 +16,27 @@ public partial class AppShell : Shell
     }
 
     /// <summary>Обновява заглавието на flyout елемента за вход – "Вход" или "Изход" според токена; показва/скрива Админ само за Admin.</summary>
-    public async void UpdateAuthFlyoutTitleAsync()
+    public async Task UpdateAuthFlyoutTitleAsync()
     {
-        var auth = AppServices.GetRequired<AuthService>();
-        AuthFlyoutItem.Title = await auth.IsLoggedInAsync() ? "Изход" : "Вход";
-        AdminFlyoutItem.IsVisible = await auth.IsAdminAsync();
+        try
+        {
+            if (AppServices.Services == null) return;
+            var auth = AppServices.Get<AuthService>();
+            if (auth == null) return;
+            if (AuthFlyoutItem != null)
+                AuthFlyoutItem.Title = await auth.IsLoggedInAsync() ? "Изход" : "Вход";
+            if (AdminFlyoutItem != null)
+                AdminFlyoutItem.IsVisible = await auth.IsAdminAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"AppShell UpdateAuthFlyoutTitleAsync: {ex}");
+        }
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        UpdateAuthFlyoutTitleAsync();
+        _ = UpdateAuthFlyoutTitleAsync();
     }
 }

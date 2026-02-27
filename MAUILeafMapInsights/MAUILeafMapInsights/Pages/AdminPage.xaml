@@ -5,17 +5,17 @@
              Title="Админ – Потребители">
     <ScrollView>
         <VerticalStackLayout Padding="24" Spacing="12">
-            <Label x:Name="TitleLabel" Text="Потребители" FontSize="20" FontAttributes="FontAttributes.Bold" />
+            <Label x:Name="TitleLabel" Text="Потребители" FontSize="20" />
             <Label x:Name="LoadingLabel" Text="Зареждане..." IsVisible="True" />
             <CollectionView x:Name="UsersList" IsVisible="False" SelectionMode="None">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Padding="12" Margin="0,4" HasShadow="False">
+                        <Border Padding="12" Margin="0,4">
                             <VerticalStackLayout Spacing="4">
                                 <Label Text="{Binding Email}" FontAttributes="Bold" />
                                 <Label Text="{Binding RolesDisplay}" TextColor="Gray" FontSize="12" />
                             </VerticalStackLayout>
-                        </Frame>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

@@ -28,7 +28,7 @@ public partial class LoginPage : ContentPage
         {
             await _auth.RemoveTokenAsync();
             if (Shell.Current is AppShell shell)
-                shell.UpdateAuthFlyoutTitleAsync();
+                _ = shell.UpdateAuthFlyoutTitleAsync();
             await Shell.Current.GoToAsync("//Home");
         }
     }
@@ -58,7 +58,7 @@ public partial class LoginPage : ContentPage
         await _auth!.SetTokenAsync(resp.Token);
         _auth.SetRoles(resp.Roles ?? new List<string>());
         if (Shell.Current is AppShell shell)
-            shell.UpdateAuthFlyoutTitleAsync();
+            _ = shell.UpdateAuthFlyoutTitleAsync();
         await Shell.Current.GoToAsync("//Trees");
     }
 

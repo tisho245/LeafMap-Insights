@@ -49,3 +49,8 @@ dotnet run --urls "http://0.0.0.0:5203"
 - **Добави дърво** – формуляр (изисква логнат потребител), възможност за снимка от камера/галерия.
 
 Преди да тестваш, увери се че **ApiSettings.BaseUrl** и **ApiSettings.AuthApiBaseUrl** съвпадат с адресите на Data и Auth API от емулатора/телефона.
+
+## 5. Ако приложението крашва при старт
+
+- **Шрифтове:** В проекта няма OpenSans .ttf в `Resources/Fonts/`, затова регистрацията на шрифтове е изключена и стиловете ползват системен шрифт. Ако искаш Open Sans, свали `OpenSans-Regular.ttf` и `OpenSans-Semibold.ttf` от [Google Fonts](https://github.com/google/fonts/tree/main/ofl/opensans), сложи ги в `MAUILeafMapInsights/Resources/Fonts/`, и в `MauiProgram.cs` раскоментирай и добави `.ConfigureFonts(...)` след `.UseMauiMaps();`.
+- **Грешка при старт:** При необработено изключение приложението се опитва да покаже диалог с текста на грешката. Прегледай и изхода в Debug (Visual Studio Output / `dotnet run`) за пълния stack trace.

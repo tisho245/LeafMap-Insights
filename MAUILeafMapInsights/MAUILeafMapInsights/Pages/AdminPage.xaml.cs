@@ -47,7 +47,7 @@ public partial class AdminPage : ContentPage
         UsersList.IsVisible = true;
     }
 
-    private class UserDisplay
+    public class UserDisplay
     {
         public string Email { get; set; } = "";
         public string RolesDisplay { get; set; } = "";

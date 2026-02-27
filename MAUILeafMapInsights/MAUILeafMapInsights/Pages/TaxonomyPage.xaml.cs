@@ -10,7 +10,7 @@ public partial class TaxonomyPage : ContentPage
     public TaxonomyPage()
     {
         InitializeComponent();
-        LoadTaxonomy();
+        _ = LoadTaxonomyAsync();
     }
 
     private LeafMapApiService Api => _api ??= AppServices.GetRequired<LeafMapApiService>();
@@ -18,11 +18,11 @@ public partial class TaxonomyPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        LoadTaxonomy();
+        await LoadTaxonomyAsync();
     }
 
     /// <summary>Зарежда всички референтни списъци от API и ги показва в TaxonomyStack с AddSection.</summary>
-    private async void LoadTaxonomy()
+    private async Task LoadTaxonomyAsync()
     {
         TaxonomyStack.Children.Clear();
         var divs = await Api.GetDivisionsAsync();
