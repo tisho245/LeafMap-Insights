@@ -16,38 +16,33 @@ public partial class HomePage : ContentPage
     {
         base.OnParentSet();
         if (AppServices.Services != null)
-            _auth ??= AppServices.Get<AuthService>();
+            _auth ??= AppServices.GetRequired<AuthService>();
     }
 
     /// <summary>При появяване обновяваме текста на бутона за вход и заглавието в flyout менюто.</summary>
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        if (AppServices.Services == null) return;
+        var auth = _auth ?? AppServices.GetRequired<AuthService>();
         try
         {
-            if (AppServices.Services == null) return;
-            var auth = _auth ?? AppServices.Get<AuthService>();
-            if (auth == null) { if (AuthButton != null) AuthButton.Text = "Вход"; return; }
-            if (AuthButton != null)
-                AuthButton.Text = await auth.IsLoggedInAsync() ? "Изход" : "Вход";
+            AuthButton.Text = await auth.IsLoggedInAsync() ? "Изход" : "Вход";
             if (Shell.Current is AppShell shell)
-                _ = shell.UpdateAuthFlyoutTitleAsync();
+                shell.UpdateAuthFlyoutTitleAsync();
         }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"HomePage OnAppearing: {ex}");
-            if (AuthButton != null) AuthButton.Text = "Вход";
-        }
+        catch { /* avoid startup crash */ }
     }
 
-    private async void OnTreesClicked(object sender, EventArgs e) => await Shell.Current.GoToAsync("//Trees");
-    private async void OnMapClicked(object sender, EventArgs e) => await Shell.Current.GoToAsync("//Map");
-    private async void OnTaxonomyClicked(object sender, EventArgs e) => await Shell.Current.GoToAsync("//Taxonomy");
+    private async void OnTreesClicked(object? sender, EventArgs e) => await Shell.Current.GoToAsync("//Trees");
+    private async void OnMapClicked(object? sender, EventArgs e) => await Shell.Current.GoToAsync("//Map");
+    private async void OnTaxonomyClicked(object? sender, EventArgs e) => await Shell.Current.GoToAsync("//Taxonomy");
 
-    private async void OnAddTreeClicked(object sender, EventArgs e)
+    private async void OnAddTreeClicked(object? sender, EventArgs e)
     {
-        var auth = _auth ?? AppServices.Get<AuthService>();
-        if (auth == null || !await auth.IsLoggedInAsync())
+        if (AppServices.Services == null) return;
+        var auth = _auth ?? AppServices.GetRequired<AuthService>();
+        if (!await auth.IsLoggedInAsync())
         {
             await Shell.Current.GoToAsync("//Login");
             return;
@@ -56,16 +51,16 @@ public partial class HomePage : ContentPage
     }
 
     /// <summary>Ако потребителят е логнат – изтриваме токена и показваме "Вход"; иначе навигираме към Login.</summary>
-    private async void OnAuthClicked(object sender, EventArgs e)
+    private async void OnAuthClicked(object? sender, EventArgs e)
     {
-        var auth = _auth ?? AppServices.Get<AuthService>();
-        if (auth == null) { await Shell.Current.GoToAsync("//Login"); return; }
+        if (AppServices.Services == null) return;
+        var auth = _auth ?? AppServices.GetRequired<AuthService>();
         if (await auth.IsLoggedInAsync())
         {
             await auth.RemoveTokenAsync();
             AuthButton.Text = "Вход";
             if (Shell.Current is AppShell shell)
-                _ = shell.UpdateAuthFlyoutTitleAsync();
+                shell.UpdateAuthFlyoutTitleAsync();
         }
         else
             await Shell.Current.GoToAsync("//Login");

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Добави дърво — LeafMap Insights</title>
+  <link rel="icon" href="logo.png" type="image/png" sizes="32x32">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
@@ -20,9 +21,12 @@
         <a href="map.html" class="nav-link nav-btn">Карта</a>
         <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
         <a href="add-tree.html" class="nav-link nav-btn">Добави дърво</a>
-        <span class="nav-auth">
-          <span id="userEmail" class="user-email"></span>
+        <a href="admin.html" class="nav-link nav-btn">Админ</a>
+        <span class="nav-auth" id="navAuth">
+          <span class="auth-status-text">Не сте влезли</span>
+          <span class="auth-badge" id="authBadge" hidden><span class="badge-dot"></span> Влезли сте като: <span id="userEmail" class="user-email"></span></span>
           <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
+          <a href="register.html" class="btn btn-ghost" id="btnRegister">Регистрация</a>
           <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
         </span>
       </nav>
@@ -39,14 +43,18 @@
         <label for="treeName">Име</label>
         <input type="text" id="treeName" name="name" required placeholder="Име на дървото">
       </div>
+      <div class="map-picker-section">
+        <p class="map-picker-hint">Кликни на картата по-долу, за да избереш местоположение (ширина и дължина се попълват автоматично).</p>
+        <div id="mapPicker" class="map-view"></div>
+      </div>
       <div class="form-row two-cols">
         <div>
-          <label for="treeLat">Ширина (Latitude)</label>
-          <input type="number" id="treeLat" name="latitude" step="any" required placeholder="42.6977">
+          <label for="treeLat">Ширина (Latitude) <em>— от картата</em></label>
+          <input type="number" id="treeLat" name="latitude" step="any" required placeholder="42.6977" readonly>
         </div>
         <div>
-          <label for="treeLng">Дължина (Longitude)</label>
-          <input type="number" id="treeLng" name="longitude" step="any" required placeholder="23.3219">
+          <label for="treeLng">Дължина (Longitude) <em>— от картата</em></label>
+          <input type="number" id="treeLng" name="longitude" step="any" required placeholder="23.3219" readonly>
         </div>
       </div>
       <div class="form-row">
@@ -85,6 +93,8 @@
   <footer class="footer">
     <p>LeafMap Insights — API клиент.</p>
   </footer>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/axios@1.6/dist/axios.min.js"></script>
   <script src="app.js"></script>
 </body>

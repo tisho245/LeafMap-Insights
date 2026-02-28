@@ -4,35 +4,67 @@ using Microsoft.EntityFrameworkCore;
 namespace ASPLeadMapInsightsAPI.Data;
 
 /// <summary>
-/// Първоначално запълване на БД при първо стартиране. Добавя по един запис във всяка референтна таблица
-/// и два примера за дървета, за да може приложението да работи веднага след миграциите.
+/// Запълване на таксономичните таблици и примерни дървета при стартиране.
+/// Идемпотентно: добавя само липсващи записи по име.
 /// </summary>
 public static class SeedData
 {
+    private static readonly string[] DivisionNames = { "Magnoliophyta", "Pinophyta", "Pteridophyta" };
+    private static readonly string[] ClassNames = { "Magnoliopsida", "Pinopsida", "Polypodiopsida" };
+    private static readonly string[] FamilyNames = { "Fagaceae", "Betulaceae", "Pinaceae", "Rosaceae", "Salicaceae", "Oleaceae", "Aceraceae" };
+    private static readonly string[] GenusNames = { "Quercus", "Fagus", "Betula", "Pinus", "Picea", "Rosa", "Salix", "Fraxinus", "Acer" };
+    private static readonly string[] SpeciesNames = { "Quercus robur", "Quercus petraea", "Fagus sylvatica", "Betula pendula", "Pinus sylvestris", "Picea abies", "Acer platanoides", "Fraxinus excelsior" };
+
     /// <summary>
-    /// Ако Divisions вече има записи – нищо не прави (идемпотентно). Иначе добавя референтни данни и два Tree.
+    /// Добавя таксономия и примерни дървета ако липсват. Може да се вика многократно.
     /// </summary>
     public static async Task EnsureSeededAsync(LeafMapDbContext context)
     {
-        if (await context.Divisions.AnyAsync())
+        await EnsureTaxonomyAsync(context);
+        await EnsureSampleTreesAsync(context);
+    }
+
+    private static async Task EnsureTaxonomyAsync(LeafMapDbContext context)
+    {
+        foreach (var name in DivisionNames)
+        {
+            if (!await context.Divisions.AnyAsync(d => d.Name == name))
+                context.Divisions.Add(new Division { Name = name });
+        }
+        foreach (var name in ClassNames)
+        {
+            if (!await context.TaxonomyClasses.AnyAsync(c => c.Name == name))
+                context.TaxonomyClasses.Add(new TaxonomyClass { Name = name });
+        }
+        foreach (var name in FamilyNames)
+        {
+            if (!await context.Families.AnyAsync(f => f.Name == name))
+                context.Families.Add(new Family { Name = name });
+        }
+        foreach (var name in GenusNames)
+        {
+            if (!await context.Genera.AnyAsync(g => g.Name == name))
+                context.Genera.Add(new Genus { Name = name });
+        }
+        foreach (var name in SpeciesNames)
+        {
+            if (!await context.Species.AnyAsync(s => s.Name == name))
+                context.Species.Add(new Species { Name = name });
+        }
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task EnsureSampleTreesAsync(LeafMapDbContext context)
+    {
+        if (await context.Trees.AnyAsync())
             return;
 
-        // Един запис във всяка референтна таблица – достатъчно за тест и демо.
-        context.Divisions.Add(new Division { Name = "Magnoliophyta" });
-        context.TaxonomyClasses.Add(new TaxonomyClass { Name = "Magnoliopsida" });
-        context.Genera.Add(new Genus { Name = "Quercus" });
-        context.Families.Add(new Family { Name = "Fagaceae" });
-        context.Species.Add(new Species { Name = "Quercus robur" });
-        await context.SaveChangesAsync();
+        var divisionId = (await context.Divisions.OrderBy(d => d.Id).FirstAsync()).Id;
+        var classId = (await context.TaxonomyClasses.OrderBy(c => c.Id).FirstAsync()).Id;
+        var genusId = (await context.Genera.FirstAsync(g => g.Name == "Quercus")).Id;
+        var familyId = (await context.Families.FirstAsync(f => f.Name == "Fagaceae")).Id;
+        var speciesId = (await context.Species.FirstAsync(s => s.Name == "Quercus robur")).Id;
 
-        // Взимаме Id-тата на току-що добавените записи за да ги свържем с Tree.
-        var divisionId = (await context.Divisions.FirstAsync()).Id;
-        var classId = (await context.TaxonomyClasses.FirstAsync()).Id;
-        var genusId = (await context.Genera.FirstAsync()).Id;
-        var familyId = (await context.Families.FirstAsync()).Id;
-        var speciesId = (await context.Species.FirstAsync()).Id;
-
-        // Два примерни дървета с координати в София – за карта и тестове.
         context.Trees.AddRange(
             new Tree
             {

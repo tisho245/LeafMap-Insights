@@ -3,7 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MAUILeafMapInsights.Pages.TaxonomyPage"
              Title="Таксономия">
-    <ScrollView>
-        <VerticalStackLayout x:Name="TaxonomyStack" Padding="24" Spacing="16" />
-    </ScrollView>
+
+    <Grid RowDefinitions="Auto,*">
+        <VerticalStackLayout Grid.Row="0" Padding="20,16,20,8" Spacing="4">
+            <Label Text="Таксономия" StyleClass="PageTitle" />
+            <Label Text="Преглед на йерархията: отдел → клас → семейство → род → вид."
+                   StyleClass="PageSubtitle" />
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout x:Name="TaxonomyStack" Padding="16,0,16,24" Spacing="16" />
+        </ScrollView>
+    </Grid>
 </ContentPage>

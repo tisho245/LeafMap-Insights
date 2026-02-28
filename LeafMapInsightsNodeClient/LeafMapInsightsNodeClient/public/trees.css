@@ -1,0 +1,224 @@
+.trees-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.trees-subtitle {
+  margin: 0.25rem 0 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+  max-width: 78ch;
+}
+
+.trees-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.tree-search {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(11, 31, 20, 0.14);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 22px rgba(14, 28, 20, 0.06);
+  min-width: min(520px, 100%);
+}
+
+.tree-search-icon { opacity: 0.9; }
+
+.tree-search input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.tree-search:focus-within {
+  border-color: rgba(31, 122, 77, 0.45);
+  box-shadow: var(--ring);
+}
+
+.tree-sort-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.tree-sort {
+  padding: 0.62rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(11, 31, 20, 0.14);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(14, 28, 20, 0.06);
+}
+
+.tree-sort:focus {
+  outline: none;
+  border-color: rgba(31, 122, 77, 0.45);
+  box-shadow: var(--ring);
+}
+
+.tree-count {
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(11, 31, 20, 0.12);
+  background: rgba(255, 255, 255, 0.75);
+  font-weight: 900;
+  color: rgba(11, 31, 20, 0.85);
+}
+
+.list-shell {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.70));
+  box-shadow: var(--shadow);
+  padding: 1rem;
+  position: relative;
+  overflow: visible;
+}
+
+.list-shell::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background:
+    radial-gradient(900px 340px at 10% 0%, rgba(123, 211, 137, 0.18), transparent 60%),
+    radial-gradient(820px 320px at 90% 30%, rgba(31, 122, 77, 0.12), transparent 60%),
+    radial-gradient(780px 340px at 50% 120%, rgba(10, 160, 110, 0.10), transparent 60%);
+  opacity: 0.95;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.list-shell > * { position: relative; z-index: 1; }
+
+.loading {
+  color: var(--muted);
+  font-weight: 700;
+  margin: 0.3rem 0 0.7rem;
+}
+
+.error-msg {
+  color: var(--error);
+  font-weight: 800;
+  margin: 0.3rem 0 0.7rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(11, 31, 20, 0.12);
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(14, 28, 20, 0.08);
+  overflow: hidden;
+  cursor: default;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 22px rgba(14, 28, 20, 0.12);
+  border-color: rgba(31, 122, 77, 0.3);
+  background: #fff;
+}
+
+.card .card-actions .btn {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.card-body { padding: 1.05rem 1.05rem 0.85rem; }
+
+.card-title {
+  margin: 0 0 0.45rem 0;
+  font-size: 1.1rem;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+.card-meta {
+  margin: 0.25rem 0;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.card-desc {
+  margin: 0.65rem 0 0 0;
+  color: rgba(95, 119, 106, 0.95);
+  line-height: 1.45;
+  font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-actions {
+  padding: 0 1.05rem 1.05rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Линк „Детайли” – без transform (картата има overflow:hidden), стабилен hover */
+.card-details-link {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s ease, background 0.2s ease, filter 0.2s ease;
+}
+.card-details-link:hover {
+  transform: none;
+  box-shadow: 0 10px 28px rgba(31, 122, 77, 0.3);
+  filter: brightness(1.08);
+}
+.card-details-link:active {
+  transform: none;
+  filter: brightness(0.98);
+}
+.card-actions .btn-edit-tree,
+.card-actions .btn-delete-tree {
+  position: relative;
+}
+
+.empty {
+  margin: 0;
+  padding: 1rem;
+  color: var(--muted);
+  font-weight: 700;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 980px) {
+  .tree-search { min-width: 100%; }
+  .cards { grid-template-columns: 1fr; }
+}

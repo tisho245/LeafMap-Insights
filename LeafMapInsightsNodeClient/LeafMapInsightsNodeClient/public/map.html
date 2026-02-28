@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Карта — LeafMap Insights</title>
+  <link rel="icon" href="logo.png" type="image/png" sizes="32x32">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+</head>
+<body data-page="map">
+  <div class="bg-leaf-canvas" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo">
+        <a href="index.html" class="logo-link" aria-label="LeafMap Insights - Начало">
+          <img src="logo.png" alt="LeafMap Insights" class="logo-img" />
+        </a>
+      </h1>
+      <button class="burger" id="btnBurger" type="button" aria-label="Отвори меню" aria-expanded="false" aria-controls="siteNav">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav" id="siteNav" aria-label="Основна навигация">
+        <div class="nav-mobile-head">
+          <span class="nav-mobile-title">Меню</span>
+          <button type="button" class="nav-close" id="btnNavClose" aria-label="Затвори меню">✕</button>
+        </div>
+        <a href="index.html" class="nav-link nav-btn">Начало</a>
+        <a href="trees.html" class="nav-link nav-btn">Дървета</a>
+        <a href="map.html" class="nav-link nav-btn">Карта</a>
+        <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
+        <a href="add-tree.html" class="nav-link nav-btn nav-btn-accent" id="addTreeLink" hidden>Добави дърво</a>
+        <span class="nav-auth" id="navAuth">
+          <a href="admin.html" class="btn btn-ghost" id="adminLink" hidden>Админ</a>
+          <span class="auth-status-text">Не сте влезли</span>
+          <span class="auth-badge" id="authBadge" hidden><span class="badge-dot"></span> Влезли сте като: <span id="userEmail" class="user-email"></span></span>
+          <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
+          <a href="register.html" class="btn btn-ghost" id="btnRegister">Регистрация</a>
+          <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+  <div class="nav-overlay" id="navOverlay" hidden></div>
+
+  <main class="main">
+    <h2 class="view-title">Карта с дървета</h2>
+    <p class="text-muted" style="margin-bottom: 1rem;">Дърветата са маркирани на картата. Кликни върху маркер за детайли. Ново дърво можеш да добавиш от <a href="add-tree.html">Добави дърво</a> — там избираш мястото на картата.</p>
+    <div id="mapContainer" class="map-container">
+      <div id="mapLoading" class="loading">Зареждане на карта...</div>
+      <div id="mapError" class="error-msg" hidden></div>
+      <div id="map" class="map-view"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>LeafMap Insights</p>
+  </footer>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6/dist/axios.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

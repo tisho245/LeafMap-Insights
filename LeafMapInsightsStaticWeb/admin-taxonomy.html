@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Таксономия — LeafMap Insights</title>
+  <title>Таксономия — Админ — LeafMap Insights</title>
+  <link rel="icon" href="logo.png" type="image/png" sizes="32x32">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body data-page="taxonomy">
+<body data-page="admin-taxonomy">
   <header class="header">
     <div class="header-inner">
       <h1 class="logo"><a href="index.html" class="logo-link">LeafMap Insights</a></h1>
@@ -17,12 +18,15 @@
       <nav class="nav">
         <a href="index.html" class="nav-link nav-btn">Начало</a>
         <a href="trees.html" class="nav-link nav-btn">Дървета</a>
+        <a href="map.html" class="nav-link nav-btn">Карта</a>
         <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
         <a href="add-tree.html" class="nav-link nav-btn">Добави дърво</a>
-        <span class="nav-auth">
-          <span id="userEmail" class="user-email"></span>
+        <a href="admin.html" class="nav-link nav-btn">Админ</a>
+        <span class="nav-auth" id="navAuth">
+          <span class="auth-status-text">Не сте влезли</span>
+          <span class="auth-badge" id="authBadge" hidden><span class="badge-dot"></span> Влезли сте като: <span id="userEmail" class="user-email"></span></span>
           <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
-          <a href="admin.html" class="btn btn-ghost" id="adminLink" hidden>Админ</a>
+          <a href="register.html" class="btn btn-ghost" id="btnRegister">Регистрация</a>
           <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
         </span>
       </nav>
@@ -30,7 +34,8 @@
   </header>
 
   <main class="main">
-    <h2 class="view-title">Таксономия</h2>
+    <h2 class="view-title">Управление на таксономия</h2>
+    <p class="text-muted"><a href="admin.html">← Админ</a></p>
     <div class="taxonomy-grid">
       <div class="taxonomy-card">
         <h3>Отдели (Divisions)</h3>
@@ -55,12 +60,38 @@
     </div>
     <div id="taxonomyLoading" class="loading">Зареждане на таксономия...</div>
     <div id="taxonomyError" class="error-msg" hidden></div>
+
+    <div id="taxModal" class="modal-overlay" hidden>
+      <div class="modal-box">
+        <h3 id="taxModalTitle">Таксономия</h3>
+        <form id="taxModalForm">
+          <input type="hidden" id="taxModalEndpoint" value="">
+          <input type="hidden" id="taxModalId" value="">
+          <div class="form-row">
+            <label for="taxModalName">Име</label>
+            <input type="text" id="taxModalName" required placeholder="Име">
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Запази</button>
+            <button type="button" class="btn btn-ghost" id="taxModalClose">Отказ</button>
+          </div>
+        </form>
+        <div id="taxModalError" class="error-msg" hidden></div>
+      </div>
+    </div>
   </main>
 
   <footer class="footer">
-    <p>LeafMap Insights — Node.js клиент.</p>
+    <p>LeafMap Insights — API клиент.</p>
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/axios@1.6/dist/axios.min.js"></script>
   <script src="app.js"></script>
+  <script>
+    (function() {
+      if (typeof isAdmin !== 'function' || !isAdmin()) {
+        document.querySelector('.main').innerHTML = '<p>Нямате достъп. <a href="login.html">Вход</a> като администратор.</p>';
+      }
+    })();
+  </script>
 </body>
 </html>

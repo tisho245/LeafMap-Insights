@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Добави дърво — LeafMap Insights</title>
+  <link rel="icon" href="logo.png" type="image/png" sizes="32x32">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="add-tree.css" />
+</head>
+
+<body data-page="add-tree">
+  <div class="bg-leaf-canvas" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo">
+        <a href="index.html" class="logo-link" aria-label="LeafMap Insights - Начало">
+          <img src="logo.png" alt="LeafMap Insights" class="logo-img" />
+        </a>
+      </h1>
+
+      <button class="burger" id="btnBurger" type="button"
+              aria-label="Отвори меню" aria-expanded="false" aria-controls="siteNav">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav" id="siteNav" aria-label="Основна навигация">
+        <div class="nav-mobile-head">
+          <span class="nav-mobile-title">Меню</span>
+          <button type="button" class="nav-close" id="btnNavClose" aria-label="Затвори меню">✕</button>
+        </div>
+
+        <a href="index.html" class="nav-link nav-btn">Начало</a>
+        <a href="trees.html" class="nav-link nav-btn">Дървета</a>
+        <a href="map.html" class="nav-link nav-btn">Карта</a>
+        <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
+        <a href="add-tree.html" class="nav-link nav-btn nav-btn-accent" id="addTreeLink" hidden>Добави дърво</a>
+
+        <span class="nav-auth" id="navAuth">
+          <a href="admin.html" class="btn btn-ghost" id="adminLink" hidden>Админ</a>
+          <span class="auth-status-text">Не сте влезли</span>
+          <span class="auth-badge" id="authBadge" hidden><span class="badge-dot"></span> Влезли сте като: <span id="userEmail" class="user-email"></span></span>
+          <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
+          <a href="register.html" class="btn btn-ghost" id="btnRegister">Регистрация</a>
+          <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="nav-overlay" id="navOverlay" hidden></div>
+
+  <main class="main">
+    <div class="add-head">
+      <div>
+        <h2 class="view-title">Добави дърво</h2>
+        <p class="add-subtitle">Попълни данните и избери таксономия. Координатите са задължителни.</p>
+      </div>
+    </div>
+
+    <section class="add-shell">
+      <div id="addTreeLoginRequired" class="info-msg info-card" hidden>
+        <div class="info-title">Нужен е вход</div>
+        <div class="info-text">
+          Моля, <a href="login.html?next=add-tree.html">влезте</a> в системата, за да добавяте дървета.
+        </div>
+      </div>
+
+      <form id="formAddTree" class="form-add-tree add-form" hidden>
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="treeName">Име</label>
+            <input type="text" id="treeName" name="name" required placeholder="Име на дървото">
+            <div class="field-hint">Пример: “Дъб до библиотеката”.</div>
+          </div>
+
+          <div class="map-picker-section">
+            <p class="field-hint" style="margin-bottom: 0.5rem;">Кликни на картата по-долу, за да избереш местоположение — ширина и дължина се попълват автоматично.</p>
+            <div id="mapPicker" class="map-view"></div>
+          </div>
+          <div class="form-row two-cols">
+            <div>
+              <label for="treeLat">Ширина (Latitude) <em>— от картата</em></label>
+              <input type="number" id="treeLat" name="latitude" step="any" required placeholder="42.6977" readonly>
+            </div>
+            <div>
+              <label for="treeLng">Дължина (Longitude) <em>— от картата</em></label>
+              <input type="number" id="treeLng" name="longitude" step="any" required placeholder="23.3219" readonly>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="treeDescription">Описание</label>
+            <textarea id="treeDescription" name="description" rows="3" placeholder="Кратко описание (по избор)"></textarea>
+            <div class="field-hint">Можеш да добавиш възраст, състояние, белези и т.н.</div>
+          </div>
+
+          <div class="tax-grid">
+            <div class="form-row">
+              <label for="treeDivisionId">Отдел</label>
+              <select id="treeDivisionId" name="divisionId" required></select>
+            </div>
+            <div class="form-row">
+              <label for="treeTaxonomyClassId">Клас</label>
+              <select id="treeTaxonomyClassId" name="taxonomyClassId" required></select>
+            </div>
+            <div class="form-row">
+              <label for="treeFamilyId">Семейство</label>
+              <select id="treeFamilyId" name="familyId" required></select>
+            </div>
+            <div class="form-row">
+              <label for="treeGenusId">Род</label>
+              <select id="treeGenusId" name="genusId" required></select>
+            </div>
+            <div class="form-row">
+              <label for="treeSpeciesId">Вид</label>
+              <select id="treeSpeciesId" name="speciesId" required></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions add-actions">
+          <button type="submit" class="btn btn-primary">Запази</button>
+          <button type="reset" class="btn btn-ghost">Изчисти</button>
+        </div>
+      </form>
+
+      <div id="addTreeSuccess" class="success-msg success-card" hidden></div>
+      <div id="addTreeError" class="error-msg error-card" hidden></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>LeafMap Insights</p>
+  </footer>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6/dist/axios.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

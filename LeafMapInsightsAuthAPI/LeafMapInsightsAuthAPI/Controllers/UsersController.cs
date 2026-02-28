@@ -32,12 +32,7 @@ public class UsersController : ControllerBase
         foreach (var u in users)
         {
             var roles = await _userManager.GetRolesAsync(u);
-            result.Add(new UserDto
-            {
-                Id = u.Id,
-                Email = u.Email ?? string.Empty,
-                Roles = roles.ToList()
-            });
+            result.Add(MapToDto(u, roles));
         }
 
         return Ok(result);
@@ -50,12 +45,28 @@ public class UsersController : ControllerBase
         if (user == null) return NotFound();
 
         var roles = await _userManager.GetRolesAsync(user);
-        return Ok(new UserDto
+        return Ok(MapToDto(user, roles));
+    }
+
+    private static UserDto MapToDto(IdentityUser u, IList<string> roles)
+    {
+        return new UserDto
         {
-            Id = user.Id,
-            Email = user.Email ?? string.Empty,
+            Id = u.Id,
+            UserName = u.UserName ?? string.Empty,
+            NormalizedUserName = u.NormalizedUserName,
+            Email = u.Email,
+            NormalizedEmail = u.NormalizedEmail,
+            EmailConfirmed = u.EmailConfirmed,
+            PhoneNumber = u.PhoneNumber,
+            PhoneNumberConfirmed = u.PhoneNumberConfirmed,
+            TwoFactorEnabled = u.TwoFactorEnabled,
+            LockoutEnd = u.LockoutEnd,
+            LockoutEnabled = u.LockoutEnabled,
+            AccessFailedCount = u.AccessFailedCount,
+            ConcurrencyStamp = u.ConcurrencyStamp,
             Roles = roles.ToList()
-        });
+        };
     }
 
     [HttpPost]
@@ -63,8 +74,13 @@ public class UsersController : ControllerBase
     {
         var user = new IdentityUser
         {
-            UserName = request.Email,
-            Email = request.Email
+            UserName = request.UserName.Trim(),
+            Email = request.Email?.Trim(),
+            EmailConfirmed = request.EmailConfirmed,
+            PhoneNumber = request.PhoneNumber?.Trim(),
+            PhoneNumberConfirmed = request.PhoneNumberConfirmed,
+            TwoFactorEnabled = request.TwoFactorEnabled,
+            LockoutEnabled = request.LockoutEnabled
         };
 
         var createResult = await _userManager.CreateAsync(user, request.Password);
@@ -83,14 +99,7 @@ public class UsersController : ControllerBase
         }
 
         var userRoles = await _userManager.GetRolesAsync(user);
-        var dto = new UserDto
-        {
-            Id = user.Id,
-            Email = user.Email ?? string.Empty,
-            Roles = userRoles.ToList()
-        };
-
-        return CreatedAtAction(nameof(GetById), new { id = user.Id }, dto);
+        return CreatedAtAction(nameof(GetById), new { id = user.Id }, MapToDto(user, userRoles));
     }
 
     [HttpPut("{id}")]
@@ -99,11 +108,14 @@ public class UsersController : ControllerBase
         var user = await _userManager.FindByIdAsync(id);
         if (user == null) return NotFound();
 
-        if (!string.Equals(user.Email, request.Email, StringComparison.OrdinalIgnoreCase))
-        {
-            user.Email = request.Email;
-            user.UserName = request.Email;
-        }
+        user.UserName = request.UserName.Trim();
+        user.Email = request.Email?.Trim();
+        user.EmailConfirmed = request.EmailConfirmed;
+        user.PhoneNumber = request.PhoneNumber?.Trim();
+        user.PhoneNumberConfirmed = request.PhoneNumberConfirmed;
+        user.TwoFactorEnabled = request.TwoFactorEnabled;
+        user.LockoutEnd = request.LockoutEnd;
+        user.LockoutEnabled = request.LockoutEnabled;
 
         var updateResult = await _userManager.UpdateAsync(user);
         if (!updateResult.Succeeded)
@@ -149,20 +161,44 @@ public class UsersController : ControllerBase
 public class UserDto
 {
     public string Id { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
+    public string? NormalizedUserName { get; set; }
+    public string? Email { get; set; }
+    public string? NormalizedEmail { get; set; }
+    public bool EmailConfirmed { get; set; }
+    public string? PhoneNumber { get; set; }
+    public bool PhoneNumberConfirmed { get; set; }
+    public bool TwoFactorEnabled { get; set; }
+    public DateTimeOffset? LockoutEnd { get; set; }
+    public bool LockoutEnabled { get; set; }
+    public int AccessFailedCount { get; set; }
+    public string? ConcurrencyStamp { get; set; }
     public List<string> Roles { get; set; } = new();
 }
 
 public class CreateUserRequest
 {
-    public string Email { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
+    public string? Email { get; set; }
     public string Password { get; set; } = string.Empty;
+    public bool EmailConfirmed { get; set; }
+    public string? PhoneNumber { get; set; }
+    public bool PhoneNumberConfirmed { get; set; }
+    public bool TwoFactorEnabled { get; set; }
+    public bool LockoutEnabled { get; set; }
     public List<string>? Roles { get; set; }
 }
 
 public class UpdateUserRequest
 {
-    public string Email { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
+    public string? Email { get; set; }
+    public bool EmailConfirmed { get; set; }
+    public string? PhoneNumber { get; set; }
+    public bool PhoneNumberConfirmed { get; set; }
+    public bool TwoFactorEnabled { get; set; }
+    public DateTimeOffset? LockoutEnd { get; set; }
+    public bool LockoutEnabled { get; set; }
     public List<string>? Roles { get; set; }
 }
 

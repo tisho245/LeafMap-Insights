@@ -7,7 +7,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "YourStrong!Pass123"
+      MSSQL_SA_PASSWORD: "SuperAdmin2026"
     ports:
       - "1433:1433"
     volumes:
@@ -19,7 +19,7 @@ services:
       context: .
       dockerfile: ASPLeadMapInsightsAPI/ASPLeadMapInsightsAPI/Dockerfile
     environment:
-      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=LeafMapInsights;User Id=sa;Password=YourStrong!Pass123;TrustServerCertificate=True;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=LeafMapInsights;User Id=sa;Password=SuperAdmin2026;TrustServerCertificate=True;"
       Jwt__Key: "YourSecretKeyAtLeast32CharactersLong!"
       Jwt__Issuer: "LeafMapInsightsAPI"
       Jwt__Audience: "LeafMapInsights"
@@ -35,7 +35,7 @@ services:
       context: .
       dockerfile: LeafMapInsightsAuthAPI/LeafMapInsightsAuthAPI/Dockerfile
     environment:
-      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=LeafMapInsights;User Id=sa;Password=YourStrong!Pass123;TrustServerCertificate=True;"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=LeafMapInsights;User Id=sa;Password=SuperAdmin2026;TrustServerCertificate=True;"
       Jwt__Key: "YourSecretKeyAtLeast32CharactersLong!"
       Jwt__Issuer: "LeafMapInsightsAPI"
       Jwt__Audience: "LeafMapInsights"

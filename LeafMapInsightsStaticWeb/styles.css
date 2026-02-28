@@ -52,14 +52,14 @@ body::before {
   z-index: -1;
 }
 
-/* Header */
+/* Header – винаги над картата (Leaflet използва z-index 400) */
 .header {
-  background: linear-gradient(180deg, rgba(26, 35, 30, 0.95) 0%, rgba(15, 20, 18, 0.98) 100%);
+  background: linear-gradient(180deg, rgba(26, 35, 30, 0.98) 0%, rgba(15, 20, 18, 0.99) 100%);
   border-bottom: 1px solid var(--border);
   padding: 1rem 0;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 500;
 }
 
 .header-inner {
@@ -136,12 +136,65 @@ body::before {
   gap: 0.75rem;
 }
 
-.user-email {
-  font-size: 0.85rem;
+/* Ясна индикация за състояние на вход – видима в навбара */
+.nav-auth {
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.nav-auth.auth-guest {
+  background: rgba(120, 120, 120, 0.15);
+}
+.nav-auth.auth-guest .auth-status-text {
+  display: inline;
   color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.nav-auth.auth-guest .user-email { display: none; }
+.nav-auth.auth-logged-in .auth-status-text {
+  display: none;
+}
+.nav-auth.auth-logged-in {
+  background: rgba(74, 124, 89, 0.25);
+  border-color: var(--accent-muted);
+}
+.nav-auth.auth-logged-in .auth-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--accent-light);
+}
+.nav-auth.auth-logged-in .user-email {
+  display: inline;
+  font-weight: 500;
+  color: var(--accent-light);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  font-size: 0.9rem;
   max-width: 180px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.auth-status-text {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+.auth-badge {
+  display: none;
+}
+.auth-badge .badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  flex-shrink: 0;
 }
 
 /* Main */
@@ -151,6 +204,9 @@ body::before {
   margin: 0 auto;
   padding: 2rem 1.5rem;
   width: 100%;
+  min-height: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .view {
@@ -379,8 +435,23 @@ body::before {
 /* Cards */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  contain: layout;
+}
+.cards-list {
+  min-height: 0;
+}
+.load-more-wrap {
+  margin-top: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.load-more-count {
+  font-size: 0.9rem;
+  color: var(--text-muted);
 }
 
 .card {
@@ -460,6 +531,47 @@ body::before {
   font-size: 0.95rem;
 }
 
+/* Admin */
+.admin-section { margin-top: 1rem; }
+.admin-table-wrap {
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  max-height: 60vh;
+}
+.admin-table {
+  width: 100%;
+  min-width: 320px;
+  border-collapse: collapse;
+  background: var(--bg-card);
+}
+.admin-table th,
+.admin-table td {
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.admin-table th { white-space: nowrap; }
+.admin-table td {
+  white-space: nowrap;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-table td:first-child,
+.admin-table th:first-child { white-space: normal; max-width: none; }
+.admin-table th {
+  background: var(--bg-card-hover);
+  color: var(--accent-light);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.admin-table tr:last-child td { border-bottom: none; }
+.admin-table code.small { font-size: 0.8rem; color: var(--text-muted); }
+.text-muted { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; }
+
 /* Taxonomy */
 .taxonomy-grid {
   display: grid;
@@ -520,10 +632,18 @@ body::before {
   padding: 0.6rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg-dark);
+  background: var(--bg-card);
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 0.95rem;
+}
+.form-row select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239ca89f' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2rem;
 }
 
 .form-row input:focus,
@@ -534,11 +654,6 @@ body::before {
   box-shadow: 0 0 0 2px rgba(74, 124, 89, 0.25);
 }
 
-.form-row two-cols {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
 
 .form-row.two-cols {
   display: grid;
@@ -552,7 +667,37 @@ body::before {
   margin-top: 1.5rem;
 }
 
-/* Modal */
+/* Admin toolbar & actions */
+.admin-toolbar { margin-bottom: 1rem; }
+.admin-actions { white-space: nowrap; }
+.admin-actions .btn { margin-right: 0.25rem; }
+
+/* Modal – не се показва при зареждане, само при .modal-open */
+#taxModal,
+#userModal {
+  display: none !important;
+  pointer-events: none;
+}
+#taxModal.modal-open,
+#userModal.modal-open {
+  display: flex !important;
+  pointer-events: auto;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(8px);
+}
+.modal-overlay.modal-open {
+  display: flex;
+}
 .modal {
   position: fixed;
   inset: 0;
@@ -572,13 +717,51 @@ body::before {
 
 .modal-box {
   position: relative;
-  background: var(--bg-card);
+  background: #1e2822;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.5rem;
+  border-radius: 12px;
+  padding: 1.5rem 1.75rem;
   width: 100%;
-  max-width: 380px;
-  box-shadow: var(--shadow);
+  max-width: 400px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+.modal-box h3 {
+  margin: 0 0 1.25rem 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.modal-box .form-row {
+  margin-bottom: 1rem;
+}
+.modal-box .form-row:last-of-type {
+  margin-bottom: 1.25rem;
+}
+.modal-box input[type="text"],
+.modal-box input[type="email"],
+.modal-box input[type="password"] {
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  color: var(--text);
+  width: 100%;
+  font-size: 0.95rem;
+}
+.modal-box input:focus {
+  outline: none;
+  border-color: var(--accent-muted);
+}
+.modal-box .form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+.modal-box .btn-primary {
+  flex: 1;
+}
+.modal-box .btn-ghost {
+  padding: 0.5rem 1rem;
 }
 
 .modal-tabs {
@@ -699,24 +882,82 @@ body::before {
   font-size: 0.8rem;
 }
 
-/* Карта */
+/* Map – под менюто (header z-index: 500) */
 .map-container {
   position: relative;
+  z-index: 1;
   margin-top: 0.5rem;
+  min-height: 200px;
+  max-height: 70vh;
 }
 .map-view {
   width: 100%;
-  min-height: 400px;
-  height: 60vh;
+  min-height: 300px;
+  height: 55vh;
+  max-height: 600px;
   border-radius: var(--radius);
   background: var(--bg-card);
 }
+/* Leaflet контейнерът да остане под header */
+.map-container .leaflet-pane { z-index: 1; }
+.map-container .leaflet-top,
+.map-container .leaflet-bottom { z-index: 2; }
 .map-view .leaflet-popup-content a {
   color: var(--accent-light);
 }
+/* Map picker (add-tree page) */
+.map-picker-section {
+  margin-bottom: 1.5rem;
+}
+.map-picker-section .map-picker-hint {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+#mapPicker {
+  width: 100%;
+  min-height: 280px;
+  height: 40vh;
+  max-height: 400px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+/* Маркер „дърво” на картата */
+.tree-marker-icon { background: none !important; border: none !important; }
+.tree-marker-emoji { font-size: 28px; line-height: 1; display: block; text-align: center; }
+
+/* Админ табло – линкове към подстраници */
+.admin-dashboard-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.admin-dashboard-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem;
+  padding: 1.25rem; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);
+  color: inherit; text-decoration: none; transition: background 0.2s, border-color 0.2s;
+}
+.admin-dashboard-card:hover { background: var(--bg-card-hover); border-color: var(--accent-muted); }
+.admin-dashboard-icon { font-size: 1.75rem; }
+.admin-dashboard-title { font-weight: 600; }
+.admin-dashboard-desc { font-size: 0.875rem; color: var(--text-muted); }
+.admin-no-access { text-align: center; padding: 2rem; }
+.admin-no-access .btn { margin-top: 1rem; }
+
+.form-add-tree {
+  max-width: 520px;
+}
 
 /* Responsive */
+@media (max-width: 768px) {
+  .header-inner { padding: 0 1rem; }
+  .main { padding: 1rem; }
+  .view-title { font-size: 1.25rem; }
+  .admin-table th,
+  .admin-table td { padding: 0.5rem 0.4rem; font-size: 0.85rem; }
+  .admin-table td { max-width: 120px; }
+}
+
 @media (max-width: 640px) {
+  .nav { flex-wrap: wrap; gap: 0.5rem; }
   .nav-auth {
     margin-left: 0;
     width: 100%;
@@ -728,9 +969,13 @@ body::before {
 
   .cards {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
 
   .taxonomy-grid {
     grid-template-columns: 1fr;
   }
+
+  .map-view { min-height: 250px; height: 50vh; }
+  #mapPicker { min-height: 220px; height: 35vh; }
 }

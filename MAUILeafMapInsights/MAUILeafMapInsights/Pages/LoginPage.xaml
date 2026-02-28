@@ -3,14 +3,32 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MAUILeafMapInsights.Pages.LoginPage"
              Title="Вход">
-    <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="12">
-            <Label Text="Вход" FontSize="Title" />
-            <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" />
-            <Entry x:Name="PasswordEntry" Placeholder="Парола" IsPassword="True" />
-            <Label x:Name="ErrorLabel" TextColor="Red" IsVisible="False" />
-            <Button Text="Вход" Clicked="OnLoginClicked" />
-            <Button Text="Регистрация" Clicked="OnGoRegisterClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
-        </VerticalStackLayout>
-    </ScrollView>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="24" Spacing="14">
+                <Border StyleClass="Card" Padding="22,20" HorizontalOptions="Center" MaximumWidthRequest="420">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Вход" StyleClass="PageTitle" TextColor="{StaticResource Text}" />
+                        <Label Text="Влез, за да добавяш дървета и да управляваш записи." StyleClass="PageSubtitle" TextColor="{StaticResource Muted}" />
+
+                        <VerticalStackLayout Spacing="10" Margin="0,8,0,0">
+                            <Border StyleClass="Field">
+                                <Entry x:Name="EmailEntry" Placeholder="Потребителско име или email" Keyboard="Default" />
+                            </Border>
+
+                            <Border StyleClass="Field">
+                                <Entry x:Name="PasswordEntry" Placeholder="Парола" IsPassword="True" />
+                            </Border>
+
+                            <Label x:Name="ErrorLabel" TextColor="{StaticResource Error}" IsVisible="False" />
+
+                            <Button Text="Вход" Clicked="OnLoginClicked" StyleClass="PrimaryButton" />
+                            <Button Text="Регистрация" Clicked="OnGoRegisterClicked" StyleClass="GhostButton" />
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админ — LeafMap Insights</title>
+  <link rel="icon" href="logo.png" type="image/png" sizes="32x32">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="admin">
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo"><a href="index.html" class="logo-link">LeafMap Insights</a></h1>
+      <p class="tagline">Каталогизиране на дървета на карта</p>
+      <nav class="nav">
+        <a href="index.html" class="nav-link nav-btn">Начало</a>
+        <a href="trees.html" class="nav-link nav-btn">Дървета</a>
+        <a href="map.html" class="nav-link nav-btn">Карта</a>
+        <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
+        <a href="add-tree.html" class="nav-link nav-btn">Добави дърво</a>
+        <a href="admin.html" class="nav-link nav-btn">Админ</a>
+        <span class="nav-auth" id="navAuth">
+          <span class="auth-status-text">Не сте влезли</span>
+          <span class="auth-badge" id="authBadge" hidden><span class="badge-dot"></span> Влезли сте като: <span id="userEmail" class="user-email"></span></span>
+          <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
+          <a href="register.html" class="btn btn-ghost" id="btnRegister">Регистрация</a>
+          <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <h2 class="view-title">Админ</h2>
+    <div id="adminDashboard" class="admin-dashboard">
+      <p class="text-muted">Изберете област за управление.</p>
+      <div class="admin-dashboard-links">
+        <a href="admin-users.html" class="admin-dashboard-card">
+          <span class="admin-dashboard-icon">👥</span>
+          <span class="admin-dashboard-title">Потребители</span>
+          <span class="admin-dashboard-desc">Управление на потребители и роли</span>
+        </a>
+        <a href="admin-taxonomy.html" class="admin-dashboard-card">
+          <span class="admin-dashboard-icon">📋</span>
+          <span class="admin-dashboard-title">Таксономия</span>
+          <span class="admin-dashboard-desc">Отдели, класове, семейства, родове, видове</span>
+        </a>
+        <a href="admin-trees.html" class="admin-dashboard-card">
+          <span class="admin-dashboard-icon">🌳</span>
+          <span class="admin-dashboard-title">Дървета</span>
+          <span class="admin-dashboard-desc">Редактиране и изтриване на дървета</span>
+        </a>
+      </div>
+    </div>
+    <div id="adminNoAccess" class="admin-no-access" hidden>
+      <p>Нямате достъп до тази страница. Влезте като администратор.</p>
+      <a href="login.html" class="btn btn-primary">Вход</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>LeafMap Insights — API клиент.</p>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6/dist/axios.min.js"></script>
+  <script src="app.js"></script>
+  <script>
+    (function() {
+      if (typeof isAdmin !== 'function' || !isAdmin()) {
+        document.getElementById('adminDashboard').hidden = true;
+        document.getElementById('adminNoAccess').hidden = false;
+      }
+    })();
+  </script>
+</body>
+</html>

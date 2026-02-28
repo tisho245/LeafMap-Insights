@@ -3,7 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MAUILeafMapInsights.Pages.TreeDetailPage"
              Title="Детайли">
-    <ScrollView>
-        <VerticalStackLayout x:Name="ContentStack" Padding="24" Spacing="8" />
-    </ScrollView>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="24" Spacing="16">
+                <Border StyleClass="Card" Padding="18">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Детайли за дърво" StyleClass="PageTitle" TextColor="{StaticResource Text}" />
+                        <Label Text="Таксономия, координати и описание." StyleClass="PageSubtitle" TextColor="{StaticResource Muted}" />
+                        <Button x:Name="AddPhotoButton" Text="Добави снимка" Clicked="OnAddPhotoClicked" StyleClass="SecondaryButton" Margin="0,8,0,0" />
+                        <VerticalStackLayout x:Name="ContentStack" Spacing="8" Margin="0,12,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

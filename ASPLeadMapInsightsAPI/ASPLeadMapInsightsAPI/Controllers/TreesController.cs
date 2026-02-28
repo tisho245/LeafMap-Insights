@@ -60,6 +60,28 @@ public class TreesController : ControllerBase
         return Ok(await query.OrderBy(t => t.Name).ToListAsync());
     }
 
+    /// <summary>Пагиниран списък – ?skip=0&amp;take=24. Връща { items: [...], total: N } за по-лесно зареждане без замръзване.</summary>
+    [HttpGet("Paged")]
+    public async Task<ActionResult<PagedTreesResult>> GetPaged(
+        [FromQuery] int skip = 0,
+        [FromQuery] int take = 24,
+        [FromQuery] bool includeLookups = true)
+    {
+        take = Math.Clamp(take, 1, 100);
+        skip = Math.Max(0, skip);
+        var query = _context.Trees.AsQueryable();
+        var total = await query.CountAsync();
+        if (includeLookups)
+            query = query
+                .Include(t => t.Division)
+                .Include(t => t.TaxonomyClass)
+                .Include(t => t.Genus)
+                .Include(t => t.Family)
+                .Include(t => t.Species);
+        var items = await query.OrderBy(t => t.Name).Skip(skip).Take(take).ToListAsync();
+        return Ok(new PagedTreesResult { Items = items, Total = total });
+    }
+
     /// <summary>Едно дърво по Id; 404 ако няма. includeLookups за пълни данни за таксономия.</summary>
     [HttpGet("{id:int}")]
     public async Task<ActionResult<Tree>> GetById(int id, [FromQuery] bool includeLookups = false)
@@ -76,11 +98,25 @@ public class TreesController : ControllerBase
         return entity == null ? NotFound() : Ok(entity);
     }
 
-    /// <summary>Добавя ново дърво. Изисква валиден JWT в Authorization.</summary>
+    /// <summary>Добавя ново дърво. Изисква валиден JWT. Приема CreateTreeDto – само FK id-та, без навигации, за да не вмъква EF в Divisions/Families/Genera/Species/TaxonomyClasses.</summary>
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<Tree>> Create([FromBody] Tree tree)
+    public async Task<ActionResult<Tree>> Create([FromBody] CreateTreeDto dto)
     {
+        var tree = new Tree
+        {
+            Name = dto.Name?.Trim() ?? string.Empty,
+            PhotoURL = dto.PhotoURL,
+            Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim(),
+            Latitude = dto.Latitude,
+            Longitude = dto.Longitude,
+            DivisionId = dto.DivisionId,
+            TaxonomyClassId = dto.TaxonomyClassId,
+            GenusId = dto.GenusId,
+            FamilyId = dto.FamilyId,
+            SpeciesId = dto.SpeciesId,
+            KlasId = dto.KlasId
+        };
         _context.Trees.Add(tree);
         await _context.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = tree.Id }, tree);
@@ -116,4 +152,10 @@ public class TreesController : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
+}
+
+public class PagedTreesResult
+{
+    public List<Tree> Items { get; set; } = new();
+    public int Total { get; set; }
 }

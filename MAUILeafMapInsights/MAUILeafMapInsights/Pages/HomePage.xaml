@@ -2,16 +2,57 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MAUILeafMapInsights.Pages.HomePage"
-             Title="LeafMap Insights">
+             Title="Начало">
+
     <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="20">
-            <Label Text="LeafMap Insights" FontSize="28" FontAttributes="Bold" HorizontalOptions="Center" />
-            <Label Text="Каталогизиране на дървета" TextColor="Gray" HorizontalOptions="Center" />
-            <Button Text="Дървета" Clicked="OnTreesClicked" />
-            <Button Text="Карта" Clicked="OnMapClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
-            <Button Text="Таксономия" Clicked="OnTaxonomyClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
-            <Button Text="Добави дърво" Clicked="OnAddTreeClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
-            <Button x:Name="AuthButton" Text="Вход" Clicked="OnAuthClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
+        <VerticalStackLayout Padding="22,20" Spacing="20">
+            <!-- Hero card като сайта -->
+            <Border StyleClass="Card" Padding="24,22">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="Добре дошли" StyleClass="PageTitle" TextColor="{StaticResource Text}" />
+                    <Label Text="Преглеждайте дървета по таксономия и местоположение, добавяйте нови записи и изследвайте каталога."
+                           StyleClass="PageSubtitle" TextColor="{StaticResource Muted}" />
+
+                    <!-- Hero actions като сайта -->
+                    <VerticalStackLayout Margin="0,8,0,0" Spacing="10">
+                        <HorizontalStackLayout Spacing="10">
+                            <Button Text="Преглед на дървета" Clicked="OnTreesClicked" StyleClass="PrimaryButton" HorizontalOptions="Start" />
+                            <Button Text="Карта" Clicked="OnMapClicked" StyleClass="SecondaryButton" HorizontalOptions="Start" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Spacing="10">
+                            <Button Text="Таксономия" Clicked="OnTaxonomyClicked" StyleClass="SecondaryButton" HorizontalOptions="Start" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+
+                    <!-- Mini items като hero-mini на сайта -->
+                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto" ColumnSpacing="12" Margin="0,20,0,0">
+                        <Border Grid.Column="0" StyleClass="CardSoft" Padding="14,12">
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="🌿" FontSize="22" HorizontalOptions="Start" />
+                                <Label Text="Каталог" FontAttributes="Bold" FontSize="15" TextColor="{StaticResource Text}" />
+                                <Label Text="подредени записи" FontSize="13" TextColor="{StaticResource Muted}" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Border Grid.Column="1" StyleClass="CardSoft" Padding="14,12">
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="🗺️" FontSize="22" HorizontalOptions="Start" />
+                                <Label Text="Локация" FontAttributes="Bold" FontSize="15" TextColor="{StaticResource Text}" />
+                                <Label Text="координати на картата" FontSize="13" TextColor="{StaticResource Muted}" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Border Grid.Column="2" StyleClass="CardSoft" Padding="14,12">
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="🧬" FontSize="22" HorizontalOptions="Start" />
+                                <Label Text="Таксономия" FontAttributes="Bold" FontSize="15" TextColor="{StaticResource Text}" />
+                                <Label Text="род / вид / семейство" FontSize="13" TextColor="{StaticResource Muted}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+
+                    <Button x:Name="AddTreeButton" Text="Добави дърво" Clicked="OnAddTreeClicked" StyleClass="SecondaryButton" Margin="0,12,0,0" />
+                    <Button x:Name="AuthButton" Text="Вход" Clicked="OnAuthClicked" StyleClass="GhostButton" />
+                </VerticalStackLayout>
+            </Border>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

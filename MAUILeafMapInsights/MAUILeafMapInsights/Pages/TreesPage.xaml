@@ -4,26 +4,48 @@
              xmlns:models="clr-namespace:MAUILeafMapInsights.Models"
              x:Class="MAUILeafMapInsights.Pages.TreesPage"
              Title="Дървета">
+
     <Grid RowDefinitions="Auto,*">
-        <Button Grid.Row="0" Text="Обнови" Clicked="OnRefreshClicked" HorizontalOptions="Start" Margin="8" />
-        <RefreshView Grid.Row="1" x:Name="RefreshView" Refreshing="OnRefreshing">
-            <CollectionView x:Name="TreeList" SelectionMode="Single" SelectionChanged="OnTreeSelected">
-                <CollectionView.EmptyView>
-                    <Label Text="Няма дървета или грешка при зареждане. Проверете API URL и дали API-то работи." Margin="20" />
-                </CollectionView.EmptyView>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:TreeDto">
-                        <Grid Padding="12,8" ColumnDefinitions="*,Auto">
-                            <VerticalStackLayout>
-                                <Label Text="{Binding Name}" FontAttributes="Bold" />
-                                <Label Text="{Binding Species.Name, StringFormat='Вид: {0}'}" FontSize="Small" TextColor="Gray" />
-                            </VerticalStackLayout>
-                            <Label Grid.Column="1" Text="{Binding Id, StringFormat='#{0}'}" VerticalOptions="Center" TextColor="Gray" />
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </RefreshView>
-        <ActivityIndicator x:Name="Loading" Grid.RowSpan="2" IsRunning="False" IsVisible="False" Color="{StaticResource Primary}" />
+        <VerticalStackLayout Grid.Row="0" Padding="20,16" Spacing="4">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="Дървета" StyleClass="PageTitle" TextColor="{StaticResource Text}" VerticalOptions="Center" />
+                <Button Grid.Column="1" Text="Обнови" Clicked="OnRefreshClicked" StyleClass="SecondaryButton" />
+            </Grid>
+            <Label Text="Търси и преглеждай записи по вид и координати." StyleClass="PageSubtitle" TextColor="{StaticResource Muted}" />
+        </VerticalStackLayout>
+
+        <Border Grid.Row="1" StyleClass="Card" Margin="20" Padding="16">
+            <Grid>
+                <RefreshView x:Name="RefreshView" Refreshing="OnRefreshing">
+                    <CollectionView x:Name="TreeList" SelectionMode="Single" SelectionChanged="OnTreeSelected">
+                        <CollectionView.EmptyView>
+                            <Label Text="Няма дървета или грешка при зареждане. Проверете API URL и дали API-то работи."
+                                   Margin="16" TextColor="{StaticResource Muted}" />
+                        </CollectionView.EmptyView>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:TreeDto">
+                                <Border StyleClass="CardSoft" Margin="8,6" Padding="14">
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                        <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource Text}" />
+                                        <Label Grid.Column="1" Text="{Binding Id, StringFormat='#{0}'}"
+                                               VerticalOptions="Center" TextColor="{StaticResource Muted}" />
+
+                                        <Label Grid.Row="1" Grid.ColumnSpan="2"
+                                               Text="{Binding Species.Name, StringFormat='Вид: {0}'}"
+                                               FontSize="12" TextColor="{StaticResource Muted}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </RefreshView>
+
+                <ActivityIndicator x:Name="Loading"
+                                   IsRunning="False" IsVisible="False"
+                                   Color="{StaticResource Primary}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+            </Grid>
+        </Border>
     </Grid>
 </ContentPage>

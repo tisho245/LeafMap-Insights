@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text;
 using ASPLeadMapInsightsAPI.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -6,9 +7,17 @@ using Microsoft.IdentityModel.Tokens;
 
 // --- Data API: trees, taxonomy. JWT is validated only (tokens issued by Auth API). ---
 var builder = WebApplication.CreateBuilder(args);
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ASPNETCORE_URLS")))
+    builder.WebHost.UseUrls("http://0.0.0.0:5202");
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// LocalDB is Windows-only; on Linux use SQL Server (env or default).
+if (connectionString.Contains("(localdb)", StringComparison.OrdinalIgnoreCase) && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+{
+    connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+        ?? "Server=localhost,1433;Database=LeafMapInsights;User Id=sa;Password=SuperAdmin2026;TrustServerCertificate=True;";
+}
 builder.Services.AddDbContext<LeafMapDbContext>(options =>
     options.UseSqlServer(connectionString));
 

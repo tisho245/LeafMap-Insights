@@ -46,12 +46,12 @@ public partial class TreesPage : ContentPage
         }
     }
 
-    private void OnRefreshClicked(object sender, EventArgs e) => _ = LoadTreesAsync();
+    private void OnRefreshClicked(object? sender, EventArgs e) => _ = LoadTreesAsync();
 
-    private async void OnRefreshing(object sender, EventArgs e) => await LoadTreesAsync();
+    private async void OnRefreshing(object? sender, EventArgs e) => await LoadTreesAsync();
 
-    /// <summary>При избор на дърво от списъка – навигираме към TreeDetail?id=...</summary>
-    private async void OnTreeSelected(object sender, SelectionChangedEventArgs e)
+    /// <summary>При избор на дърво от списъка – навигираме към TreeDetail с id като параметър.</summary>
+    private async void OnTreeSelected(object? sender, SelectionChangedEventArgs e)
     {
         if (e.CurrentSelection.FirstOrDefault() is TreeDto tree)
         {

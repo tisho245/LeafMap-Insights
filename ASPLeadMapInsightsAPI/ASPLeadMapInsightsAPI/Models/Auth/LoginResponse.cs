@@ -1,9 +1,10 @@
 namespace ASPLeadMapInsightsAPI.Models.Auth;
 
-/// <summary>Отговор при успешен login или register – JWT токен, имейл и срок на валидност. Клиентът пази Token и го изпраща в Authorization: Bearer.</summary>
+/// <summary>Отговор при успешен login или register – JWT токен, потребителско име/имейл и срок на валидност. Клиентът пази Token и го изпраща в Authorization: Bearer.</summary>
 public class LoginResponse
 {
     public string Token { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public DateTime ExpiresAt { get; set; }
 

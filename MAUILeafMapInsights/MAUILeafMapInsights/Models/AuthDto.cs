@@ -1,9 +1,10 @@
 namespace MAUILeafMapInsights.Models;
 
-/// <summary>Тяло на заявка за вход – изпраща се на api/auth/login.</summary>
+/// <summary>Тяло на заявка за вход – изпраща се на api/auth/login. API очаква userName и password (не email).</summary>
 public class LoginRequest
 {
-    public string Email { get; set; } = "";
+    /// <summary>Изпраща се като userName към API – при вход потребителят може да въведе email или потребителско име.</summary>
+    public string UserName { get; set; } = "";
     public string Password { get; set; } = "";
 }
 

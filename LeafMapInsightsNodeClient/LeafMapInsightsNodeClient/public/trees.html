@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Дървета — LeafMap Insights</title>
+  <link rel="icon" href="logo.png" type="image/png" sizes="32x32">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="trees.css" />
+</head>
+
+<body data-page="trees">
+  <div class="bg-leaf-canvas" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo">
+        <a href="index.html" class="logo-link" aria-label="LeafMap Insights - Начало">
+          <img src="logo.png" alt="LeafMap Insights" class="logo-img" />
+        </a>
+      </h1>
+
+      <button class="burger" id="btnBurger" type="button"
+              aria-label="Отвори меню" aria-expanded="false" aria-controls="siteNav">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav" id="siteNav" aria-label="Основна навигация">
+        <div class="nav-mobile-head">
+          <span class="nav-mobile-title">Меню</span>
+          <button type="button" class="nav-close" id="btnNavClose" aria-label="Затвори меню">✕</button>
+        </div>
+
+        <a href="index.html" class="nav-link nav-btn">Начало</a>
+        <a href="trees.html" class="nav-link nav-btn">Дървета</a>
+        <a href="map.html" class="nav-link nav-btn">Карта</a>
+        <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
+        <a href="add-tree.html" class="nav-link nav-btn nav-btn-accent" id="addTreeLink" hidden>Добави дърво</a>
+
+        <span class="nav-auth" id="navAuth">
+          <a href="admin.html" class="btn btn-ghost" id="adminLink" hidden>Админ</a>
+          <span class="auth-status-text">Не сте влезли</span>
+          <span class="auth-badge" id="authBadge" hidden><span class="badge-dot"></span> Влезли сте като: <span id="userEmail" class="user-email"></span></span>
+          <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
+          <a href="register.html" class="btn btn-ghost" id="btnRegister">Регистрация</a>
+          <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="nav-overlay" id="navOverlay" hidden></div>
+
+  <main class="main">
+    <div class="trees-head">
+      <div>
+        <h2 class="view-title">Дървета</h2>
+        <p class="trees-subtitle">Търси и преглеждай записи по вид и координати.</p>
+      </div>
+
+      <div class="trees-toolbar">
+        <label class="tree-search">
+          <span class="tree-search-icon" aria-hidden="true">🔎</span>
+          <input id="treeSearch" type="search" placeholder="Търси по име / вид / координати..." autocomplete="off" />
+        </label>
+
+        <div class="tree-sort-wrap">
+          <select id="treeSort" class="tree-sort" aria-label="Сортиране">
+            <option value="nameAsc">Име (A→Z)</option>
+            <option value="nameDesc">Име (Z→A)</option>
+            <option value="speciesAsc">Вид (A→Z)</option>
+            <option value="speciesDesc">Вид (Z→A)</option>
+          </select>
+          <div class="tree-count" id="treeCount">—</div>
+        </div>
+      </div>
+    </div>
+
+    <section class="list-shell">
+      <div id="treesLoading" class="loading">Зареждане...</div>
+      <div id="treesError" class="error-msg" hidden></div>
+      <div id="treesList" class="cards"></div>
+      <div id="treesLoadMoreWrap" class="load-more-wrap" hidden>
+        <button type="button" id="treesLoadMore" class="btn btn-secondary">Покажи още</button>
+        <span id="treesCount" class="load-more-count"></span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>LeafMap Insights</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6/dist/axios.min.js"></script>
+  <script src="app.js"></script>
+
+  <script>
+    (function () {
+      const list = document.getElementById('treesList');
+      const search = document.getElementById('treeSearch');
+      const sort = document.getElementById('treeSort');
+      const count = document.getElementById('treeCount');
+
+      function getCards() {
+        return Array.from(list ? list.querySelectorAll('article.card') : []);
+      }
+      function norm(s) { return (s || '').toLowerCase().trim(); }
+
+      function getName(card) {
+        const el = card.querySelector('.card-title');
+        return norm(el ? el.textContent : '');
+      }
+      function getSpecies(card) {
+        const meta = Array.from(card.querySelectorAll('.card-meta')).find(p => (p.textContent || '').includes('Вид:'));
+        return norm(meta ? meta.textContent.replace('Вид:', '') : '');
+      }
+      function cardText(card) {
+        return norm(card.innerText || card.textContent || '');
+      }
+
+      function applyFilter() {
+        const q = norm(search ? search.value : '');
+        const cards = getCards();
+        cards.forEach(c => {
+          const ok = !q || cardText(c).includes(q);
+          c.hidden = !ok;
+        });
+        updateCount();
+      }
+
+      var skipContainerRefresh = false;
+      function applySort() {
+        const cards = getCards();
+        const mode = sort ? sort.value : 'nameAsc';
+        const visibleCards = cards.filter(c => !c.hidden);
+        const hiddenCards = cards.filter(c => c.hidden);
+        const keyFn = (c) => {
+          if (mode.startsWith('species')) return getSpecies(c);
+          return getName(c);
+        };
+        visibleCards.sort((a, b) => {
+          const ka = keyFn(a);
+          const kb = keyFn(b);
+          if (ka < kb) return -1;
+          if (ka > kb) return 1;
+          return 0;
+        });
+        if (mode.endsWith('Desc')) visibleCards.reverse();
+        if (list) {
+          skipContainerRefresh = true;
+          visibleCards.forEach(c => list.appendChild(c));
+          hiddenCards.forEach(c => list.appendChild(c));
+          setTimeout(function () { skipContainerRefresh = false; }, 0);
+        }
+      }
+
+      function updateCount() {
+        if (!count) return;
+        const cards = getCards();
+        const vis = cards.filter(c => !c.hidden).length;
+        const tot = cards.length;
+        count.textContent = tot ? `${vis} / ${tot}` : '—';
+      }
+
+      function refresh() {
+        applyFilter();
+        applySort();
+        updateCount();
+      }
+
+      var refreshTimer = null;
+      function scheduleRefresh() {
+        if (refreshTimer) clearTimeout(refreshTimer);
+        refreshTimer = setTimeout(function () { refresh(); refreshTimer = null; }, 80);
+      }
+
+      if (search) search.addEventListener('input', function () { applyFilter(); applySort(); updateCount(); });
+      if (sort) sort.addEventListener('change', function () { applySort(); updateCount(); });
+
+      if (list) {
+        var obs = new MutationObserver(function () {
+          if (skipContainerRefresh) return;
+          scheduleRefresh();
+        });
+        obs.observe(list, { childList: true, subtree: true });
+      }
+      window.addEventListener('treesLoaded', function () { refresh(); });
+    })();
+  </script>
+</body>
+</html>

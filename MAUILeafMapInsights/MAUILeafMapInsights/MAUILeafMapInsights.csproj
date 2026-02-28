@@ -39,11 +39,14 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+
+		<!-- Изключване на Fast Deployment за Android – избягва XA0129 при deploy на някои устройства/емулатори -->
+		<EmbedAssembliesIntoApk Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">true</EmbedAssembliesIntoApk>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+		<!-- App Icon – логото (appicon.png в AppIcon; името appicon да съвпада с AndroidManifest @mipmap/appicon) -->
+		<MauiIcon Include="Resources\AppIcon\appicon.png" />
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -61,9 +64,14 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Resources\Styles\LeafMapTheme.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>

@@ -19,9 +19,7 @@ public class LeafMapApiService
     {
         _http = http;
         _auth = auth;
-        var baseUrl = (ApiSettings.BaseUrl ?? "").Trim();
-        if (string.IsNullOrEmpty(baseUrl)) baseUrl = "https://localhost:7234";
-        _http.BaseAddress = new Uri(baseUrl.TrimEnd('/'));
+        _http.BaseAddress = new Uri(ApiSettings.BaseUrl.TrimEnd('/'));
         _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 
@@ -34,11 +32,11 @@ public class LeafMapApiService
             : new AuthenticationHeaderValue("Bearer", token);
     }
 
-    /// <summary>Вход – POST към Auth API (api/auth/login). При успех връща LoginResponse с Token.</summary>
-    public async Task<LoginResponse?> LoginAsync(string email, string password, CancellationToken ct = default)
+    /// <summary>Вход – POST към Auth API (api/auth/login). API очаква userName и password; изпращаме въведения текст като userName.</summary>
+    public async Task<LoginResponse?> LoginAsync(string userNameOrEmail, string password, CancellationToken ct = default)
     {
-        var baseAuth = (ApiSettings.AuthApiBaseUrl ?? "https://localhost:7240").Trim().TrimEnd('/');
-        var body = JsonSerializer.Serialize(new LoginRequest { Email = email, Password = password });
+        var baseAuth = ApiSettings.AuthApiBaseUrl.TrimEnd('/');
+        var body = JsonSerializer.Serialize(new LoginRequest { UserName = userNameOrEmail, Password = password });
         var content = new StringContent(body, Encoding.UTF8, "application/json");
         var res = await _http.PostAsync($"{baseAuth}/api/auth/login", content, ct);
         if (!res.IsSuccessStatusCode) return null;
@@ -48,7 +46,7 @@ public class LeafMapApiService
     /// <summary>Регистрация – POST към Auth API (api/auth/register). При успех връща LoginResponse с Token.</summary>
     public async Task<LoginResponse?> RegisterAsync(string email, string password, string? userName, CancellationToken ct = default)
     {
-        var baseAuth = (ApiSettings.AuthApiBaseUrl ?? "https://localhost:7240").Trim().TrimEnd('/');
+        var baseAuth = ApiSettings.AuthApiBaseUrl.TrimEnd('/');
         var body = JsonSerializer.Serialize(new RegisterRequest { Email = email, Password = password, UserName = userName });
         var content = new StringContent(body, Encoding.UTF8, "application/json");
         var res = await _http.PostAsync($"{baseAuth}/api/auth/register", content, ct);
@@ -69,6 +67,15 @@ public class LeafMapApiService
     {
         await EnsureTokenAsync();
         return await GetAsync<TreeDto>($"api/trees/{id}?includeLookups=true", ct);
+    }
+
+    /// <summary>Обновява съществуващо дърво – PUT api/trees/{id}. Изисква валиден JWT (логнат потребител или админ).</summary>
+    public async Task<bool> UpdateTreeAsync(int id, TreeDto tree, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var body = JsonSerializer.Serialize(tree);
+        var res = await _http.PutAsync($"api/trees/{id}", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        return res.IsSuccessStatusCode;
     }
 
     /// <summary>Създава ново дърво – POST api/trees. Изисква валиден JWT.</summary>
@@ -127,10 +134,172 @@ public class LeafMapApiService
     public async Task<List<UserDto>?> GetUsersAsync(CancellationToken ct = default)
     {
         await EnsureTokenAsync();
-        var baseAuth = (ApiSettings.AuthApiBaseUrl ?? "https://localhost:7240").Trim().TrimEnd('/');
+        var baseAuth = ApiSettings.AuthApiBaseUrl.TrimEnd('/');
         var res = await _http.GetAsync($"{baseAuth}/api/users", ct);
         if (!res.IsSuccessStatusCode) return null;
         return JsonSerializer.Deserialize<List<UserDto>>(await res.Content.ReadAsStringAsync(ct), _jsonOpt);
+    }
+
+    /// <summary>Един потребител по id – Auth API api/users/{id}.</summary>
+    public async Task<UserDto?> GetUserByIdAsync(string id, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var baseAuth = ApiSettings.AuthApiBaseUrl.TrimEnd('/');
+        var res = await _http.GetAsync($"{baseAuth}/api/users/{Uri.EscapeDataString(id)}", ct);
+        if (!res.IsSuccessStatusCode) return null;
+        return JsonSerializer.Deserialize<UserDto>(await res.Content.ReadAsStringAsync(ct), _jsonOpt);
+    }
+
+    /// <summary>Създава потребител – POST Auth API api/users.</summary>
+    public async Task<(bool ok, string? error)> CreateUserAsync(CreateUserRequest request, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var baseAuth = ApiSettings.AuthApiBaseUrl.TrimEnd('/');
+        var body = JsonSerializer.Serialize(request);
+        var res = await _http.PostAsync($"{baseAuth}/api/users", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        if (res.IsSuccessStatusCode) return (true, null);
+        var err = await res.Content.ReadAsStringAsync(ct);
+        return (false, err);
+    }
+
+    /// <summary>Обновява потребител – PUT Auth API api/users/{id}.</summary>
+    public async Task<(bool ok, string? error)> UpdateUserAsync(string id, UpdateUserRequest request, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var baseAuth = ApiSettings.AuthApiBaseUrl.TrimEnd('/');
+        var body = JsonSerializer.Serialize(request);
+        var res = await _http.PutAsync($"{baseAuth}/api/users/{Uri.EscapeDataString(id)}", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        if (res.IsSuccessStatusCode) return (true, null);
+        return (false, await res.Content.ReadAsStringAsync(ct));
+    }
+
+    /// <summary>Изтрива потребител – DELETE Auth API api/users/{id}.</summary>
+    public async Task<(bool ok, string? error)> DeleteUserAsync(string id, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var baseAuth = ApiSettings.AuthApiBaseUrl.TrimEnd('/');
+        var res = await _http.DeleteAsync($"{baseAuth}/api/users/{Uri.EscapeDataString(id)}", ct);
+        if (res.IsSuccessStatusCode) return (true, null);
+        return (false, await res.Content.ReadAsStringAsync(ct));
+    }
+
+    /// <summary>Изтрива дърво – DELETE api/trees/{id}. Admin.</summary>
+    public async Task<bool> DeleteTreeAsync(int id, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var res = await _http.DeleteAsync($"api/trees/{id}", ct);
+        return res.IsSuccessStatusCode;
+    }
+
+    /// <summary>Създава отдел – POST api/divisions. Admin.</summary>
+    public async Task<bool> CreateDivisionAsync(DivisionDto dto, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var body = JsonSerializer.Serialize(dto);
+        var res = await _http.PostAsync("api/divisions", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        return res.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> UpdateDivisionAsync(int id, DivisionDto dto, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var body = JsonSerializer.Serialize(new DivisionDto { Id = id, Name = dto.Name });
+        var res = await _http.PutAsync($"api/divisions/{id}", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        return res.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> DeleteDivisionAsync(int id, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        return (await _http.DeleteAsync($"api/divisions/{id}", ct)).IsSuccessStatusCode;
+    }
+
+    public async Task<bool> CreateTaxonomyClassAsync(TaxonomyClassDto dto, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var body = JsonSerializer.Serialize(dto);
+        var res = await _http.PostAsync("api/taxonomyclasses", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        return res.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> UpdateTaxonomyClassAsync(int id, TaxonomyClassDto dto, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var body = JsonSerializer.Serialize(new TaxonomyClassDto { Id = id, Name = dto.Name });
+        var res = await _http.PutAsync($"api/taxonomyclasses/{id}", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        return res.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> DeleteTaxonomyClassAsync(int id, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        return (await _http.DeleteAsync($"api/taxonomyclasses/{id}", ct)).IsSuccessStatusCode;
+    }
+
+    public async Task<bool> CreateFamilyAsync(FamilyDto dto, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var body = JsonSerializer.Serialize(dto);
+        var res = await _http.PostAsync("api/families", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        return res.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> UpdateFamilyAsync(int id, FamilyDto dto, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var body = JsonSerializer.Serialize(new FamilyDto { Id = id, Name = dto.Name });
+        var res = await _http.PutAsync($"api/families/{id}", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        return res.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> DeleteFamilyAsync(int id, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        return (await _http.DeleteAsync($"api/families/{id}", ct)).IsSuccessStatusCode;
+    }
+
+    public async Task<bool> CreateGenusAsync(GenusDto dto, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var body = JsonSerializer.Serialize(dto);
+        var res = await _http.PostAsync("api/genera", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        return res.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> UpdateGenusAsync(int id, GenusDto dto, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var body = JsonSerializer.Serialize(new GenusDto { Id = id, Name = dto.Name });
+        var res = await _http.PutAsync($"api/genera/{id}", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        return res.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> DeleteGenusAsync(int id, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        return (await _http.DeleteAsync($"api/genera/{id}", ct)).IsSuccessStatusCode;
+    }
+
+    public async Task<bool> CreateSpeciesAsync(SpeciesDto dto, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var body = JsonSerializer.Serialize(dto);
+        var res = await _http.PostAsync("api/species", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        return res.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> UpdateSpeciesAsync(int id, SpeciesDto dto, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var body = JsonSerializer.Serialize(new SpeciesDto { Id = id, Name = dto.Name });
+        var res = await _http.PutAsync($"api/species/{id}", new StringContent(body, Encoding.UTF8, "application/json"), ct);
+        return res.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> DeleteSpeciesAsync(int id, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        return (await _http.DeleteAsync($"api/species/{id}", ct)).IsSuccessStatusCode;
     }
 
     /// <summary>Вътрешен GET помощник – десериализира JSON отговор в T.</summary>

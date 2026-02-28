@@ -1,59 +1,51 @@
-using Microsoft.Maui.Controls.Maps;
-using Microsoft.Maui.Maps;
+using System.Text.Json;
 using MAUILeafMapInsights.Models;
 using MAUILeafMapInsights.Services;
 
 namespace MAUILeafMapInsights.Pages;
 
-/// <summary>Карта с маркери за всички дървета от API. На Android без валиден API ключ показваме само съобщение, за да не крашва приложението.</summary>
+/// <summary>Карта с дървета чрез OpenStreetMap (Leaflet) в WebView – без API ключ.</summary>
 public partial class MapPage : ContentPage
 {
     private LeafMapApiService? _api;
-    private readonly Dictionary<Pin, int> _pinToTreeId = new();
-    private Microsoft.Maui.Controls.Maps.Map? _map;
+    private List<TreeDto>? _pendingTrees;
+    private bool _webViewReady;
 
     public MapPage()
     {
         InitializeComponent();
-
-        // На Windows MAUI Map няма handler – показваме placeholder. На Android без API ключ също.
-        if (DeviceInfo.Platform == DevicePlatform.Android)
-        {
-            MapContainer.Content = new Label
-            {
-                Text = "За карта на Android задайте Google Maps API ключ в Platforms/Android/AndroidManifest.xml (com.google.android.geo.API_KEY). Дърветата можете да преглеждате от „Дървета“.",
-                Margin = new Thickness(16),
-                VerticalOptions = LayoutOptions.Center,
-                HorizontalOptions = LayoutOptions.Center,
-                HorizontalTextAlignment = TextAlignment.Center
-            };
-        }
-        else if (DeviceInfo.Platform == DevicePlatform.WinUI)
-        {
-            MapContainer.Content = new Label
-            {
-                Text = "Картата не е налична на Windows. Дърветата можете да преглеждате от „Дървета“.",
-                Margin = new Thickness(16),
-                VerticalOptions = LayoutOptions.Center,
-                HorizontalOptions = LayoutOptions.Center,
-                HorizontalTextAlignment = TextAlignment.Center
-            };
-        }
-        else
-        {
-            _map = new Microsoft.Maui.Controls.Maps.Map();
-            MapContainer.Content = _map;
-        }
-
-        Loaded += (_, _) => _ = LoadTreesAsync();
+        MapWebView.Source = new HtmlWebViewSource { Html = GetMapHtml() };
+        MapWebView.Navigating += OnMapWebViewNavigating;
+        MapWebView.Navigated += OnMapWebViewNavigated;
     }
 
-    private LeafMapApiService? Api => _api ??= AppServices.Get<LeafMapApiService>();
+    private LeafMapApiService Api => _api ??= AppServices.GetRequired<LeafMapApiService>();
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
         _ = LoadTreesAsync();
+    }
+
+    private void OnMapWebViewNavigating(object? sender, WebNavigatingEventArgs e)
+    {
+        if (e.Url?.StartsWith("leafmap://", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            e.Cancel = true;
+            var uri = new Uri(e.Url);
+            if (uri.Host.Equals("tree", StringComparison.OrdinalIgnoreCase) && uri.Segments.Length > 1 && int.TryParse(uri.Segments[^1].TrimEnd('/'), out var id))
+                _ = Shell.Current.GoToAsync($"TreeDetail?id={id}");
+        }
+    }
+
+    private async void OnMapWebViewNavigated(object? sender, WebNavigatedEventArgs e)
+    {
+        _webViewReady = true;
+        if (_pendingTrees != null)
+        {
+            await InjectTreesAsync(_pendingTrees);
+            _pendingTrees = null;
+        }
     }
 
     private async Task LoadTreesAsync()
@@ -62,45 +54,14 @@ public partial class MapPage : ContentPage
         Loading.IsVisible = true;
         try
         {
-            var api = Api;
-            if (api == null) return;
-            var list = await api.GetTreesAsync();
-            if (_map == null)
+            var list = await Api.GetTreesAsync();
+            var trees = list ?? new List<TreeDto>();
+            _pendingTrees = trees;
+            if (_webViewReady)
             {
-                if (list is { Count: > 0 } && MapContainer.Content is Label lbl)
-                    lbl.Text = (DeviceInfo.Platform == DevicePlatform.WinUI ? "Картата не е налична на Windows.\n\n" : "За карта на Android задайте Google Maps API ключ в Platforms/Android/AndroidManifest.xml (com.google.android.geo.API_KEY).\n\n") + "Дървета в каталога: " + list.Count + ".";
-                return;
+                await InjectTreesAsync(trees);
+                _pendingTrees = null;
             }
-
-            _map.Pins.Clear();
-            _pinToTreeId.Clear();
-
-            if (list is not { Count: > 0 })
-                return;
-
-            foreach (var tree in list)
-            {
-                var pin = new Pin
-                {
-                    Label = tree.Name,
-                    Address = tree.Species?.Name ?? $"Дърво #{tree.Id}",
-                    Type = PinType.Place,
-                    Location = new Location(tree.Latitude, tree.Longitude)
-                };
-                pin.MarkerClicked += OnPinMarkerClicked;
-                _map.Pins.Add(pin);
-                _pinToTreeId[pin] = tree.Id;
-            }
-
-            var minLat = list.Min(t => t.Latitude);
-            var maxLat = list.Max(t => t.Latitude);
-            var minLng = list.Min(t => t.Longitude);
-            var maxLng = list.Max(t => t.Longitude);
-            var center = new Location((minLat + maxLat) / 2, (minLng + maxLng) / 2);
-            var latSpan = Math.Max(maxLat - minLat, 0.005);
-            var lngSpan = Math.Max(maxLng - minLng, 0.005);
-            var km = Math.Max(latSpan * 111, lngSpan * 111 * Math.Cos(center.Latitude * Math.PI / 180));
-            _map.MoveToRegion(MapSpan.FromCenterAndRadius(center, Distance.FromKilometers(Math.Max(km, 1))));
         }
         finally
         {
@@ -109,12 +70,76 @@ public partial class MapPage : ContentPage
         }
     }
 
-    private async void OnPinMarkerClicked(object? sender, PinClickedEventArgs e)
+    private async Task InjectTreesAsync(List<TreeDto> trees)
     {
-        e.HideInfoWindow = true;
-        if (sender is Pin pin && _pinToTreeId.TryGetValue(pin, out var id))
-            await Shell.Current.GoToAsync($"TreeDetail?id={id}");
+        var data = trees.Select(t => new { id = t.Id, name = t.Name ?? "", lat = t.Latitude, lng = t.Longitude }).ToList();
+        var json = JsonSerializer.Serialize(data);
+        var script = "setTrees(" + json + ");";
+        try
+        {
+            await MapWebView.EvaluateJavaScriptAsync(script);
+        }
+        catch
+        {
+            // WebView още не е готов или платформата не поддържа
+        }
     }
 
     private void OnRefreshClicked(object? sender, EventArgs e) => _ = LoadTreesAsync();
+
+    private static string GetMapHtml()
+    {
+        return """
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+*{margin:0;padding:0;}
+html,body,#map{height:100%;width:100%;}
+.leaflet-popup-content-wrapper{border-radius:12px;}
+.tree-marker-icon{background:none!important;border:none!important;}
+.tree-marker-emoji{font-size:28px;line-height:1;display:block;text-align:center;}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+(function(){
+var DEFAULT_MAP_CENTER = [42.655780716559626, 24.747289594150434];
+var map = L.map('map', { zoomControl: true }).setView(DEFAULT_MAP_CENTER, 12);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+function getTreeMarkerIcon() {
+  return L.divIcon({
+    className: 'tree-marker-icon',
+    html: '<span class="tree-marker-emoji" aria-hidden="true">🌳</span>',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32]
+  });
+}
+var treeIcon = getTreeMarkerIcon();
+var markers = [];
+window.setTrees = function(data) {
+  markers.forEach(function(m){ map.removeLayer(m); });
+  markers = [];
+  map.setView(DEFAULT_MAP_CENTER, 12);
+  if (!data || data.length === 0) return;
+  data.forEach(function(t){
+    var m = L.marker([t.lat, t.lng], { icon: treeIcon }).addTo(map).bindPopup((t.name && t.name.length) ? t.name : ('ID ' + t.id));
+    m.on('click', function(){ window.location = 'leafmap://tree/' + t.id; });
+    markers.push(m);
+  });
+};
+})();
+</script>
+</body>
+</html>
+""";
+    }
 }

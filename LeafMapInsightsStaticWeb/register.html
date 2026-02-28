@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Регистрация — LeafMap Insights</title>
+  <link rel="icon" href="logo.png" type="image/png" sizes="32x32">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
@@ -20,9 +21,12 @@
         <a href="map.html" class="nav-link nav-btn">Карта</a>
         <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
         <a href="add-tree.html" class="nav-link nav-btn">Добави дърво</a>
-        <span class="nav-auth">
-          <span id="userEmail" class="user-email"></span>
+        <a href="admin.html" class="nav-link nav-btn">Админ</a>
+        <span class="nav-auth" id="navAuth">
+          <span class="auth-status-text">Не сте влезли</span>
+          <span class="auth-badge" id="authBadge" hidden><span class="badge-dot"></span> Влезли сте като: <span id="userEmail" class="user-email"></span></span>
           <a href="login.html" class="nav-link nav-btn" id="btnLogin">Вход</a>
+          <a href="register.html" class="btn btn-ghost" id="btnRegister">Регистрация</a>
           <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
         </span>
       </nav>

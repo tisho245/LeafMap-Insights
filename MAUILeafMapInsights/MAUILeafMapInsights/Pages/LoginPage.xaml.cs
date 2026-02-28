@@ -20,47 +20,53 @@ public partial class LoginPage : ContentPage
         _auth ??= AppServices.GetRequired<AuthService>();
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
         EnsureServices();
-        if (await _auth!.IsLoggedInAsync())
-        {
-            await _auth.RemoveTokenAsync();
-            if (Shell.Current is AppShell shell)
-                _ = shell.UpdateAuthFlyoutTitleAsync();
-            await Shell.Current.GoToAsync("//Home");
-        }
+        ErrorLabel.IsVisible = false;
     }
 
     /// <summary>Вика api/auth/login; при успех записва Token в SecureStorage и отива към списъка с дървета.</summary>
-    private async void OnLoginClicked(object sender, EventArgs e)
+    private async void OnLoginClicked(object? sender, EventArgs e)
     {
         EnsureServices();
         ErrorLabel.IsVisible = false;
-        var email = EmailEntry.Text?.Trim() ?? "";
+
+        var userNameOrEmail = EmailEntry.Text?.Trim() ?? "";
         var password = PasswordEntry.Text ?? "";
-        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+
+        if (string.IsNullOrEmpty(userNameOrEmail) || string.IsNullOrEmpty(password))
         {
-            ErrorLabel.Text = "Въведете email и парола.";
+            ErrorLabel.Text = "Въведете потребителско име/email и парола.";
             ErrorLabel.IsVisible = true;
             return;
         }
 
-        var resp = await _api!.LoginAsync(email, password);
-        if (resp == null)
+        try
         {
-            ErrorLabel.Text = "Невалиден email или парола.";
-            ErrorLabel.IsVisible = true;
-            return;
-        }
+            var resp = await _api!.LoginAsync(userNameOrEmail, password);
+            if (resp == null)
+            {
+                ErrorLabel.Text = "Невалидно потребителско име или парола.";
+                ErrorLabel.IsVisible = true;
+                return;
+            }
 
-        await _auth!.SetTokenAsync(resp.Token);
-        _auth.SetRoles(resp.Roles ?? new List<string>());
-        if (Shell.Current is AppShell shell)
-            _ = shell.UpdateAuthFlyoutTitleAsync();
-        await Shell.Current.GoToAsync("//Trees");
+            await _auth!.SetTokenAsync(resp.Token);
+            _auth.SetRoles(resp.Roles ?? new List<string>());
+
+            if (Shell.Current is AppShell shell)
+                shell.UpdateAuthFlyoutTitleAsync();
+
+            await Shell.Current.GoToAsync("//Trees");
+        }
+        catch (Exception ex)
+        {
+            ErrorLabel.Text = ex.Message ?? "Грешка при вход.";
+            ErrorLabel.IsVisible = true;
+        }
     }
 
-    private async void OnGoRegisterClicked(object sender, EventArgs e) => await Shell.Current.GoToAsync("Register");
+    private async void OnGoRegisterClicked(object? sender, EventArgs e) => await Shell.Current.GoToAsync("Register");
 }

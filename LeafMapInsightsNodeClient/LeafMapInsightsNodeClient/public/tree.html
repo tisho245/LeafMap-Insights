@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Детайли за дърво — LeafMap Insights</title>
+  <link rel="icon" href="logo.png" type="image/png" sizes="32x32">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="tree-detail.css" />
+</head>
+
+<body data-page="tree-detail">
+  <div class="bg-leaf-canvas" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo">
+        <a href="index.html" class="logo-link" aria-label="LeafMap Insights - Начало">
+          <img src="logo.png" alt="LeafMap Insights" class="logo-img" />
+        </a>
+      </h1>
+
+      <button class="burger" id="btnBurger" type="button"
+              aria-label="Отвори меню" aria-expanded="false" aria-controls="siteNav">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav" id="siteNav" aria-label="Основна навигация">
+        <div class="nav-mobile-head">
+          <span class="nav-mobile-title">Меню</span>
+          <button type="button" class="nav-close" id="btnNavClose" aria-label="Затвори меню">✕</button>
+        </div>
+
+        <a href="index.html" class="nav-link nav-btn">Начало</a>
+        <a href="trees.html" class="nav-link nav-btn">Дървета</a>
+        <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
+
+        <a href="add-tree.html" class="nav-link nav-btn nav-btn-accent" id="addTreeLink" hidden>Добави дърво</a>
+
+        <span class="nav-auth">
+          <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
+          <a href="register.html" class="btn btn-ghost" id="btnRegister">Регистрация</a>
+          <a href="admin.html" class="btn btn-ghost" id="adminLink" hidden>Админ</a>
+          <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="nav-overlay" id="navOverlay" hidden></div>
+
+  <main class="main">
+    <div class="detail-top">
+      <a href="trees.html" class="btn btn-ghost back-btn">← Назад към списъка</a>
+
+      <div class="detail-actions">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnCopyCoords" hidden>Копирай координати</button>
+        <a class="btn btn-secondary btn-sm" id="btnOpenMaps" href="#" target="_blank" rel="noreferrer" hidden>Отвори в Maps</a>
+      </div>
+    </div>
+
+    <section class="detail-shell">
+      <div id="treeDetailContent" class="tree-detail"></div>
+
+      <div id="treeDetailLoading" class="loading">Зареждане...</div>
+      <div id="treeDetailError" class="error-msg" hidden></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>LeafMap Insights</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6/dist/axios.min.js"></script>
+  <script src="app.js"></script>
+
+  <script>
+    (function () {
+      const content = document.getElementById('treeDetailContent');
+      const btnCopy = document.getElementById('btnCopyCoords');
+      const btnMaps = document.getElementById('btnOpenMaps');
+
+      function tryExtractCoords() {
+        if (!content) return null;
+        const text = content.innerText || '';
+        const latMatch = text.match(/Ширина\s+(-?\d+(\.\d+)?)/i);
+        const lngMatch = text.match(/Дължина\s+(-?\d+(\.\d+)?)/i);
+        if (!latMatch || !lngMatch) return null;
+        return { lat: latMatch[1], lng: lngMatch[1] };
+      }
+
+      function refreshActions() {
+        const coords = tryExtractCoords();
+        if (!coords) {
+          if (btnCopy) btnCopy.hidden = true;
+          if (btnMaps) btnMaps.hidden = true;
+          return;
+        }
+        const { lat, lng } = coords;
+        if (btnCopy) btnCopy.hidden = false;
+        if (btnMaps) {
+          btnMaps.hidden = false;
+          btnMaps.href = `https://www.google.com/maps?q=${encodeURIComponent(lat)},${encodeURIComponent(lng)}`;
+        }
+      }
+
+      if (btnCopy) {
+        btnCopy.addEventListener('click', async () => {
+          const coords = tryExtractCoords();
+          if (!coords) return;
+          const value = `${coords.lat}, ${coords.lng}`;
+          try {
+            await navigator.clipboard.writeText(value);
+            btnCopy.textContent = 'Копирано ✓';
+            setTimeout(() => (btnCopy.textContent = 'Копирай координати'), 1200);
+          } catch (_) {
+          }
+        });
+      }
+
+      if (content) {
+        const obs = new MutationObserver(() => refreshActions());
+        obs.observe(content, { childList: true, subtree: true, characterData: true });
+      }
+    })();
+  </script>
+</body>
+</html>

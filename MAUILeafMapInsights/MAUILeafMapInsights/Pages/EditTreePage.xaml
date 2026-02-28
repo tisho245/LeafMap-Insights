@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MAUILeafMapInsights.Pages.EditTreePage"
+             Title="Редактирай дърво">
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="24" Spacing="16">
+                <Border StyleClass="Card" Padding="18">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Редактирай дърво" StyleClass="PageTitle" TextColor="{StaticResource Text}" />
+                        <Label Text="Промени данните и запази." StyleClass="PageSubtitle" TextColor="{StaticResource Muted}" />
+                        <VerticalStackLayout x:Name="FormStack" Spacing="12" Margin="0,10,0,0" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

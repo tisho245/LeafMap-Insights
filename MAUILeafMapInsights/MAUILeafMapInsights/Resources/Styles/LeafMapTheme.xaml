@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Фон на страниците: градиент като сайта (body), от #f7fbf7 към #eef6ef -->
+    <LinearGradientBrush x:Key="PageBackgroundBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{StaticResource Background}" Offset="0" />
+        <GradientStop Color="{StaticResource Background2}" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- Flyout header като header на сайта -->
+    <SolidColorBrush x:Key="FlyoutHeaderBrush" Color="#F7FBF7" />
+
+    <!-- Сенки като сайта: shadow и shadow-soft -->
+    <Shadow x:Key="SoftShadow" Radius="14" Opacity="0.10" Offset="0,6">
+        <Shadow.Brush><SolidColorBrush Color="#0E1C14" /></Shadow.Brush>
+    </Shadow>
+    <Shadow x:Key="CardShadow" Radius="20" Opacity="0.12" Offset="0,8">
+        <Shadow.Brush><SolidColorBrush Color="#0E1C14" /></Shadow.Brush>
+    </Shadow>
+    <Shadow x:Key="ButtonShadow" Radius="16" Opacity="0.22" Offset="0,6">
+        <Shadow.Brush><SolidColorBrush Color="#1F7A4D" /></Shadow.Brush>
+    </Shadow>
+
+    <Style TargetType="ContentPage" ApplyToDerivedTypes="True">
+        <Setter Property="Background" Value="{StaticResource PageBackgroundBrush}" />
+    </Style>
+
+    <Style TargetType="Shell" ApplyToDerivedTypes="True">
+        <Setter Property="Shell.NavBarHasShadow" Value="False" />
+        <Setter Property="Shell.BackgroundColor" Value="#F7FBF7" />
+        <Setter Property="Shell.TitleColor" Value="{StaticResource Text}" />
+        <Setter Property="Shell.ForegroundColor" Value="{StaticResource Text}" />
+        <Setter Property="Shell.FlyoutBackgroundColor" Value="#F7FBF7" />
+        <!-- Всички елементи в flyout да са с тъмен текст (контраст), без прозрачни надписи -->
+        <Setter Property="Shell.UnselectedColor" Value="{StaticResource Text}" />
+    </Style>
+
+    <!-- Заглавия като сайта: по-големи, bold -->
+    <Style TargetType="Label" Class="PageTitle">
+        <Setter Property="FontSize" Value="26" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{StaticResource Text}" />
+    </Style>
+
+    <Style TargetType="Label" Class="PageSubtitle">
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="TextColor" Value="{StaticResource Muted}" />
+        <Setter Property="LineHeight" Value="1.5" />
+    </Style>
+
+    <Style TargetType="Label" Class="FlyoutSubtitle">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="TextColor" Value="{StaticResource Muted}" />
+        <Setter Property="Margin" Value="0,8,0,0" />
+    </Style>
+
+    <!-- Карти: radius-lg 22, сянка и border като сайта -->
+    <Style TargetType="Border" Class="Card">
+        <Setter Property="Background" Value="{StaticResource Surface}" />
+        <Setter Property="Stroke" Value="{StaticResource Border}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape">
+            <RoundRectangle CornerRadius="22" />
+        </Setter>
+        <Setter Property="Shadow" Value="{StaticResource CardShadow}" />
+        <Setter Property="Padding" Value="20,18" />
+    </Style>
+
+    <Style TargetType="Border" Class="CardSoft">
+        <Setter Property="Background" Value="{StaticResource Surface}" />
+        <Setter Property="Stroke" Value="{StaticResource Border}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape">
+            <RoundRectangle CornerRadius="18" />
+        </Setter>
+        <Setter Property="Shadow">
+            <Shadow Radius="10" Opacity="0.08" Offset="0,4">
+                <Shadow.Brush><SolidColorBrush Color="#0E1C14" /></Shadow.Brush>
+            </Shadow>
+        </Setter>
+    </Style>
+
+    <Style TargetType="Border" Class="Field">
+        <Setter Property="Background" Value="#FFFFFF" />
+        <Setter Property="Stroke" Value="{StaticResource Border}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="Padding" Value="14,12" />
+        <Setter Property="StrokeShape">
+            <RoundRectangle CornerRadius="14" />
+        </Setter>
+    </Style>
+
+    <Style TargetType="Entry">
+        <Setter Property="TextColor" Value="{StaticResource Text}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource Gray500}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="FontSize" Value="15" />
+    </Style>
+
+    <Style TargetType="Editor">
+        <Setter Property="TextColor" Value="{StaticResource Text}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource Gray500}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="FontSize" Value="15" />
+    </Style>
+
+    <Style TargetType="Picker">
+        <Setter Property="TextColor" Value="{StaticResource Text}" />
+        <Setter Property="TitleColor" Value="{StaticResource Muted}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="FontSize" Value="15" />
+    </Style>
+
+    <!-- Primary бутон: градиент accent към accent3, pill, сянка като btn-primary -->
+    <Style TargetType="Button" Class="PrimaryButton">
+        <Setter Property="Background">
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="{StaticResource Primary}" Offset="0" />
+                <GradientStop Color="{StaticResource Accent3}" Offset="1" />
+            </LinearGradientBrush>
+        </Setter>
+        <Setter Property="TextColor" Value="White" />
+        <Setter Property="CornerRadius" Value="24" />
+        <Setter Property="Padding" Value="20,14" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="Shadow" Value="{StaticResource ButtonShadow}" />
+    </Style>
+
+    <!-- Secondary: бял фон, border зеленикав, pill -->
+    <Style TargetType="Button" Class="SecondaryButton">
+        <Setter Property="BackgroundColor" Value="#FFFFFF" />
+        <Setter Property="TextColor" Value="{StaticResource Text}" />
+        <Setter Property="BorderColor" Value="#1F7A4D40" />
+        <Setter Property="BorderWidth" Value="1" />
+        <Setter Property="CornerRadius" Value="24" />
+        <Setter Property="Padding" Value="18,12" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="Shadow" Value="{StaticResource SoftShadow}" />
+    </Style>
+
+    <!-- Ghost: прозрачен, border лек, text muted -->
+    <Style TargetType="Button" Class="GhostButton">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="TextColor" Value="{StaticResource Muted}" />
+        <Setter Property="BorderColor" Value="{StaticResource Border}" />
+        <Setter Property="BorderWidth" Value="1" />
+        <Setter Property="CornerRadius" Value="24" />
+        <Setter Property="Padding" Value="16,12" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontAttributes" Value="Bold" />
+    </Style>
+</ResourceDictionary>

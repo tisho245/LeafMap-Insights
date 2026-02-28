@@ -20,12 +20,14 @@ public partial class RegisterPage : ContentPage
     }
 
     /// <summary>Вика api/auth/register; при успех записва Token в SecureStorage и навигира към //Trees.</summary>
-    private async void OnRegisterClicked(object sender, EventArgs e)
+    private async void OnRegisterClicked(object? sender, EventArgs e)
     {
         EnsureServices();
         ErrorLabel.IsVisible = false;
+
         var email = EmailEntry.Text?.Trim() ?? "";
         var password = PasswordEntry.Text ?? "";
+
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
             ErrorLabel.Text = "Въведете email и парола.";
@@ -33,20 +35,30 @@ public partial class RegisterPage : ContentPage
             return;
         }
 
-        var resp = await _api!.RegisterAsync(email, password, UserNameEntry.Text?.Trim());
-        if (resp == null)
+        try
         {
-            ErrorLabel.Text = "Регистрацията не успешна.";
-            ErrorLabel.IsVisible = true;
-            return;
-        }
+            var resp = await _api!.RegisterAsync(email, password, UserNameEntry.Text?.Trim());
+            if (resp == null)
+            {
+                ErrorLabel.Text = "Регистрацията е неуспешна.";
+                ErrorLabel.IsVisible = true;
+                return;
+            }
 
-        await _auth!.SetTokenAsync(resp.Token);
-        _auth.SetRoles(resp.Roles ?? new List<string>());
-        if (Shell.Current is AppShell shell)
-            _ = shell.UpdateAuthFlyoutTitleAsync();
-        await Shell.Current.GoToAsync("//Trees");
+            await _auth!.SetTokenAsync(resp.Token);
+            _auth.SetRoles(resp.Roles ?? new List<string>());
+
+            if (Shell.Current is AppShell shell)
+                shell.UpdateAuthFlyoutTitleAsync();
+
+            await Shell.Current.GoToAsync("//Trees");
+        }
+        catch (Exception ex)
+        {
+            ErrorLabel.Text = ex.Message ?? "Грешка при регистрация.";
+            ErrorLabel.IsVisible = true;
+        }
     }
 
-    private async void OnGoLoginClicked(object sender, EventArgs e) => await Shell.Current.GoToAsync("//Login");
+    private async void OnGoLoginClicked(object? sender, EventArgs e) => await Shell.Current.GoToAsync("//Login");
 }

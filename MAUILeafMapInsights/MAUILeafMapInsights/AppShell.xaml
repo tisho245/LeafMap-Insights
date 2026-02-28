@@ -7,26 +7,86 @@
     Shell.FlyoutBehavior="Flyout"
     Title="LeafMap Insights">
 
-    <FlyoutItem Title="Начало" Icon="dotnet_bot.png">
+    <!-- Меню като node client: закръглени редове, меки цветове от темата -->
+    <Shell.ItemTemplate>
+        <DataTemplate x:DataType="FlyoutItem">
+            <Border Margin="12,4" Padding="16,14" StrokeThickness="1" Stroke="{StaticResource Border}"
+                    BackgroundColor="{StaticResource Surface}" VerticalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16" />
+                </Border.StrokeShape>
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
+                    <Image Source="{Binding FlyoutIcon}" WidthRequest="24" HeightRequest="24"
+                           VerticalOptions="Center" Grid.Column="0" />
+                    <Label Text="{Binding Title}" Grid.Column="1"
+                           FontSize="16" FontAttributes="None"
+                           TextColor="{StaticResource Text}"
+                           VerticalOptions="Center"
+                           LineBreakMode="WordWrap" MaxLines="2" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+
+    <Shell.TitleView>
+        <Grid Padding="12,6">
+            <Image Source="logo.png" HeightRequest="32" Aspect="AspectFit" HorizontalOptions="Start" />
+        </Grid>
+    </Shell.TitleView>
+
+    <Shell.FlyoutHeader>
+        <Grid Padding="20,20,20,12" RowDefinitions="Auto,Auto,1" BackgroundColor="{StaticResource Background}">
+            <Image Source="logo.png" HeightRequest="48" Aspect="AspectFit" HorizontalOptions="Start" Grid.Row="0" />
+            <Label Grid.Row="1" Text="Каталогизиране на дървета на карта"
+                   FontSize="13" TextColor="{StaticResource Muted}" Margin="0,8,0,0" LineBreakMode="WordWrap" />
+            <BoxView Grid.Row="2" HeightRequest="1" Color="{StaticResource Border}" />
+        </Grid>
+    </Shell.FlyoutHeader>
+
+    <FlyoutItem Title="Начало" Icon="logo.png">
         <ShellContent Route="Home" ContentTemplate="{DataTemplate pages:HomePage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Дървета" Icon="dotnet_bot.png">
+
+    <FlyoutItem Title="Дървета" Icon="logo.png">
         <ShellContent Route="Trees" ContentTemplate="{DataTemplate pages:TreesPage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Карта" Icon="dotnet_bot.png">
+
+    <FlyoutItem Title="Карта" Icon="logo.png">
         <ShellContent Route="Map" ContentTemplate="{DataTemplate pages:MapPage}" />
     </FlyoutItem>
-    <FlyoutItem Title="Таксономия" Icon="dotnet_bot.png">
+
+    <FlyoutItem Title="Таксономия" Icon="logo.png">
         <ShellContent Route="Taxonomy" ContentTemplate="{DataTemplate pages:TaxonomyPage}" />
     </FlyoutItem>
-    <FlyoutItem x:Name="AdminFlyoutItem" Title="Админ" Icon="dotnet_bot.png" IsVisible="False">
+
+    <FlyoutItem x:Name="AddTreeFlyoutItem" Title="Добави дърво" Icon="logo.png" IsVisible="False">
+        <ShellContent Route="AddTree" ContentTemplate="{DataTemplate pages:AddTreePage}" />
+    </FlyoutItem>
+
+    <FlyoutItem x:Name="NewUserFlyoutItem" Title="Нов потребител" Icon="logo.png" IsVisible="False">
+        <ShellContent Route="NewUser" ContentTemplate="{DataTemplate pages:AdminUserEditPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem x:Name="AdminFlyoutItem" Title="Админ" Icon="logo.png" IsVisible="False">
         <ShellContent Route="Admin" ContentTemplate="{DataTemplate pages:AdminPage}" />
     </FlyoutItem>
-    <FlyoutItem x:Name="AuthFlyoutItem" Title="Вход" Icon="dotnet_bot.png">
+
+    <!-- Вход и Регистрация – видими когато не е логнат; Регистрация е най-отдолу -->
+    <FlyoutItem x:Name="LoginFlyoutItem" Title="Вход" Icon="logo.png">
         <ShellContent Route="Login" ContentTemplate="{DataTemplate pages:LoginPage}" />
     </FlyoutItem>
 
-    <ShellContent Route="Register" ContentTemplate="{DataTemplate pages:RegisterPage}" />
-    <ShellContent Route="AddTree" ContentTemplate="{DataTemplate pages:AddTreePage}" />
+    <FlyoutItem x:Name="RegisterFlyoutItem" Title="Регистрация" Icon="logo.png">
+        <ShellContent Route="Register" ContentTemplate="{DataTemplate pages:RegisterPage}" />
+    </FlyoutItem>
+
+    <!-- Изход – видим само когато е логнат, винаги най-отдолу в менюто -->
+    <FlyoutItem x:Name="LogoutFlyoutItem" Title="Изход" Icon="logo.png" IsVisible="False">
+        <ShellContent Route="Logout" ContentTemplate="{DataTemplate pages:LoginPage}" />
+    </FlyoutItem>
+
+    <!-- Маршрути за навигация, не са в менюто -->
     <ShellContent Route="TreeDetail" ContentTemplate="{DataTemplate pages:TreeDetailPage}" />
+    <ShellContent Route="AdminUserEdit" ContentTemplate="{DataTemplate pages:AdminUserEditPage}" />
+    <ShellContent Route="EditTree" ContentTemplate="{DataTemplate pages:EditTreePage}" />
 </Shell>

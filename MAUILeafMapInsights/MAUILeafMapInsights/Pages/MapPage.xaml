@@ -3,9 +3,29 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MAUILeafMapInsights.Pages.MapPage"
              Title="Карта">
-    <Grid RowDefinitions="Auto,*">
-        <Button x:Name="RefreshButton" Grid.Row="0" Text="Обнови" Clicked="OnRefreshClicked" HorizontalOptions="Start" Margin="8" />
-        <ContentView x:Name="MapContainer" Grid.Row="1" />
-        <ActivityIndicator x:Name="Loading" Grid.RowSpan="2" IsRunning="False" IsVisible="False" Color="{StaticResource Primary}" />
+
+    <!-- Дизайн като Node client: view-title, text-muted, map-container -->
+    <Grid RowDefinitions="Auto,Auto,*">
+        <VerticalStackLayout Grid.Row="0" Padding="20,16,20,8" Spacing="6">
+            <Label Text="Карта с дървета" StyleClass="PageTitle" TextColor="{StaticResource Text}" />
+            <Label Text="Дърветата са маркирани на картата. Кликни върху маркер за детайли. Ново дърво можеш да добавиш от «Добави дърво» — там избираш мястото на картата."
+                   StyleClass="PageSubtitle"
+                   TextColor="{StaticResource Muted}"
+                   LineBreakMode="WordWrap" />
+        </VerticalStackLayout>
+
+        <HorizontalStackLayout Grid.Row="1" Padding="20,0,20,12" HorizontalOptions="End">
+            <Button Text="Обнови" Clicked="OnRefreshClicked" StyleClass="SecondaryButton" />
+        </HorizontalStackLayout>
+
+        <Border Grid.Row="2" StyleClass="Card" Margin="20,0,20,24" Padding="0" MinimumHeightRequest="280">
+            <Grid>
+                <WebView x:Name="MapWebView" MinimumHeightRequest="260" />
+                <ActivityIndicator x:Name="Loading"
+                                   IsRunning="False" IsVisible="False"
+                                   Color="{StaticResource Primary}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+            </Grid>
+        </Border>
     </Grid>
 </ContentPage>

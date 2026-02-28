@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MAUILeafMapInsights.Pages;
 using MAUILeafMapInsights.Services;
 using Microsoft.Extensions.Logging;
@@ -9,15 +10,29 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        StartupLog.Info("CreateMauiApp start");
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+        {
+            var ex = (Exception)e.ExceptionObject;
+            StartupLog.Error(ex);
+        };
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            StartupLog.Error("UnobservedTask: " + e.Exception);
+            e.SetObserved();
+        };
+
         try
         {
-        var builder = MauiApp.CreateBuilder();
-        var maui = builder.UseMauiApp<App>();
-        // Картите не са поддържани на Windows – UseMauiMaps() може да крашва. Включваме само на Android/iOS/MacCatalyst.
-#if ANDROID || IOS || MACCATALYST
-        maui.UseMauiMaps();
-#endif
-        // Шрифтове: ако добавите OpenSans-Regular.ttf и OpenSans-Semibold.ttf в Resources/Fonts/, добавете: .ConfigureFonts(fonts => { fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"); fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold"); });
+            var builder = MauiApp.CreateBuilder();
+            StartupLog.Info("Builder created");
+            builder
+                .UseMauiApp<App>()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            });
 
         // Singleton – един инстанс за цялото приложение. HttpClient и LeafMapApiService използват ApiSettings.BaseUrl.
         builder.Services.AddSingleton<AuthService>();
@@ -25,6 +40,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<LeafMapApiService>();
 
         builder.Services.AddTransient<HomePage>();
+        builder.Services.AddTransient<AdminPage>();
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<RegisterPage>();
         builder.Services.AddTransient<TreesPage>();
@@ -32,20 +48,18 @@ public static class MauiProgram
         builder.Services.AddTransient<AddTreePage>();
         builder.Services.AddTransient<TaxonomyPage>();
         builder.Services.AddTransient<MapPage>();
-        builder.Services.AddTransient<AdminPage>();
 
 #if DEBUG
-        builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
-        var app = builder.Build();
-        // Задаваме AppServices още тук – на Android activationState.Context?.Services често е null при CreateWindow.
-        AppServices.Services = app.Services;
-        return app;
+            var app = builder.Build();
+            StartupLog.Info("MauiApp built");
+            return app;
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"MauiProgram.CreateMauiApp failed: {ex}");
+            StartupLog.Error(ex);
             throw;
         }
     }

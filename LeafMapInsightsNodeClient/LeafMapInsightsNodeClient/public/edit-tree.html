@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Редактиране на дърво — LeafMap Insights</title>
+  <link rel="icon" href="logo.png" type="image/png" sizes="32x32">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="add-tree.css" />
+</head>
+<body data-page="edit-tree">
+  <div class="bg-leaf-canvas" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo">
+        <a href="index.html" class="logo-link" aria-label="LeafMap Insights - Начало">
+          <img src="logo.png" alt="LeafMap Insights" class="logo-img" />
+        </a>
+      </h1>
+      <button class="burger" id="btnBurger" type="button" aria-label="Отвори меню" aria-expanded="false" aria-controls="siteNav">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav" id="siteNav" aria-label="Основна навигация">
+        <div class="nav-mobile-head">
+          <span class="nav-mobile-title">Меню</span>
+          <button type="button" class="nav-close" id="btnNavClose" aria-label="Затвори меню">✕</button>
+        </div>
+        <a href="index.html" class="nav-link nav-btn">Начало</a>
+        <a href="trees.html" class="nav-link nav-btn">Дървета</a>
+        <a href="map.html" class="nav-link nav-btn">Карта</a>
+        <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
+        <a href="add-tree.html" class="nav-link nav-btn nav-btn-accent" id="addTreeLink" hidden>Добави дърво</a>
+        <span class="nav-auth" id="navAuth">
+          <a href="admin.html" class="btn btn-ghost" id="adminLink" hidden>Админ</a>
+          <span class="auth-status-text">Не сте влезли</span>
+          <span class="auth-badge" id="authBadge" hidden><span class="badge-dot"></span> Влезли сте като: <span id="userEmail" class="user-email"></span></span>
+          <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
+          <a href="register.html" class="btn btn-ghost" id="btnRegister">Регистрация</a>
+          <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+  <div class="nav-overlay" id="navOverlay" hidden></div>
+
+  <main class="main">
+    <h2 class="view-title">Редактиране на дърво</h2>
+    <div id="editTreeLoginRequired" class="info-msg info-card" hidden>
+      Само администратори могат да редактират. <a href="login.html?next=edit-tree.html">Влезте</a> с администраторски акаунт.
+    </div>
+    <div id="editTreeLoading" class="loading">Зареждане...</div>
+    <form id="formEditTree" class="form-add-tree add-form" hidden>
+      <input type="hidden" id="editTreeId" name="id">
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="editTreeName">Име</label>
+          <input type="text" id="editTreeName" name="name" required placeholder="Име на дървото">
+        </div>
+        <div class="map-picker-section">
+          <p class="field-hint">Кликни на картата, за да промениш местоположение.</p>
+          <div id="editMapPicker" class="map-view"></div>
+        </div>
+        <div class="form-row two-cols">
+          <div>
+            <label for="editTreeLat">Ширина (Latitude)</label>
+            <input type="number" id="editTreeLat" name="latitude" step="any" required readonly>
+          </div>
+          <div>
+            <label for="editTreeLng">Дължина (Longitude)</label>
+            <input type="number" id="editTreeLng" name="longitude" step="any" required readonly>
+          </div>
+        </div>
+        <div class="form-row">
+          <label for="editTreeDescription">Описание</label>
+          <textarea id="editTreeDescription" name="description" rows="3"></textarea>
+        </div>
+        <div class="tax-grid">
+          <div class="form-row">
+            <label for="editTreeDivisionId">Отдел</label>
+            <select id="editTreeDivisionId" name="divisionId" required></select>
+          </div>
+          <div class="form-row">
+            <label for="editTreeTaxonomyClassId">Клас</label>
+            <select id="editTreeTaxonomyClassId" name="taxonomyClassId" required></select>
+          </div>
+          <div class="form-row">
+            <label for="editTreeFamilyId">Семейство</label>
+            <select id="editTreeFamilyId" name="familyId" required></select>
+          </div>
+          <div class="form-row">
+            <label for="editTreeGenusId">Род</label>
+            <select id="editTreeGenusId" name="genusId" required></select>
+          </div>
+          <div class="form-row">
+            <label for="editTreeSpeciesId">Вид</label>
+            <select id="editTreeSpeciesId" name="speciesId" required></select>
+          </div>
+        </div>
+      </div>
+      <div class="form-actions add-actions">
+        <button type="submit" class="btn btn-primary">Запази</button>
+        <a href="trees.html" class="btn btn-ghost">Отказ</a>
+      </div>
+    </form>
+    <div id="editTreeSuccess" class="success-msg success-card" hidden></div>
+    <div id="editTreeError" class="error-msg error-card" hidden></div>
+  </main>
+
+  <footer class="footer">
+    <p>LeafMap Insights</p>
+  </footer>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6/dist/axios.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

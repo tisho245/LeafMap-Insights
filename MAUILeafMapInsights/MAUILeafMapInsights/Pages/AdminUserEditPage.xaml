@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MAUILeafMapInsights.Pages.AdminUserEditPage"
+             Title="Потребител">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="14">
+            <Border StyleClass="Card" Padding="18" MaximumWidthRequest="400">
+                <VerticalStackLayout Spacing="12">
+                    <Label x:Name="PageTitleLabel" Text="Нов потребител" StyleClass="PageTitle" TextColor="{StaticResource Text}" />
+                    <Label Text="Потребителско име, email и роли (User, Admin)." StyleClass="PageSubtitle" TextColor="{StaticResource Muted}" />
+
+                    <Border StyleClass="Field">
+                        <Entry x:Name="UserNameEntry" Placeholder="Потребителско име" TextColor="{StaticResource Text}" />
+                    </Border>
+                    <Border StyleClass="Field">
+                        <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" TextColor="{StaticResource Text}" />
+                    </Border>
+                    <Border StyleClass="Field" x:Name="PasswordWrap">
+                        <Entry x:Name="PasswordEntry" Placeholder="Парола" IsPassword="True" TextColor="{StaticResource Text}" />
+                    </Border>
+                    <Border StyleClass="Field">
+                        <Entry x:Name="RolesEntry" Placeholder="Роли (напр. User, Admin)" TextColor="{StaticResource Text}" />
+                    </Border>
+
+                    <Label x:Name="ErrorLabel" TextColor="{StaticResource Error}" IsVisible="False" />
+                    <HorizontalStackLayout Spacing="10">
+                        <Button Text="Запази" Clicked="OnSaveClicked" StyleClass="PrimaryButton" />
+                        <Button Text="Отказ" Clicked="OnCancelClicked" StyleClass="GhostButton" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

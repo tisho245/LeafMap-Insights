@@ -3,15 +3,36 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MAUILeafMapInsights.Pages.RegisterPage"
              Title="Регистрация">
-    <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="12">
-            <Label Text="Регистрация" FontSize="Title" />
-            <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" />
-            <Entry x:Name="PasswordEntry" Placeholder="Парола" IsPassword="True" />
-            <Entry x:Name="UserNameEntry" Placeholder="Потребителско име (по избор)" />
-            <Label x:Name="ErrorLabel" TextColor="Red" IsVisible="False" />
-            <Button Text="Регистрация" Clicked="OnRegisterClicked" />
-            <Button Text="Вход" Clicked="OnGoLoginClicked" BackgroundColor="Transparent" TextColor="{StaticResource Primary}" />
-        </VerticalStackLayout>
-    </ScrollView>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="24" Spacing="14">
+                <Border StyleClass="Card" Padding="22,20" HorizontalOptions="Center" MaximumWidthRequest="420">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Регистрация" StyleClass="PageTitle" TextColor="{StaticResource Text}" />
+                        <Label Text="Създай профил и започни да добавяш записи." StyleClass="PageSubtitle" TextColor="{StaticResource Muted}" />
+
+                        <VerticalStackLayout Spacing="10" Margin="0,8,0,0">
+                            <Border StyleClass="Field">
+                                <Entry x:Name="EmailEntry" Placeholder="Email" Keyboard="Email" />
+                            </Border>
+
+                            <Border StyleClass="Field">
+                                <Entry x:Name="PasswordEntry" Placeholder="Парола" IsPassword="True" />
+                            </Border>
+
+                            <Border StyleClass="Field">
+                                <Entry x:Name="UserNameEntry" Placeholder="Потребителско име (по избор)" />
+                            </Border>
+
+                            <Label x:Name="ErrorLabel" TextColor="{StaticResource Error}" IsVisible="False" />
+
+                            <Button Text="Регистрация" Clicked="OnRegisterClicked" StyleClass="PrimaryButton" />
+                            <Button Text="Вход" Clicked="OnGoLoginClicked" StyleClass="GhostButton" />
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

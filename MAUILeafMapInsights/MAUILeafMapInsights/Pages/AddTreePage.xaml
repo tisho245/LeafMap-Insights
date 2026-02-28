@@ -3,7 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MAUILeafMapInsights.Pages.AddTreePage"
              Title="Добави дърво">
+
     <ScrollView>
-        <VerticalStackLayout x:Name="FormStack" Padding="24" Spacing="12" />
+        <VerticalStackLayout Padding="20,16,20,24" Spacing="16">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Добави дърво" StyleClass="PageTitle" TextColor="{StaticResource Text}" />
+                <Label Text="Попълни данните и избери таксономия. Координатите се задават с цъкане на картата." StyleClass="PageSubtitle" TextColor="{StaticResource Muted}" LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+
+            <Border StyleClass="Card" Padding="20">
+                <VerticalStackLayout x:Name="FormStack" Spacing="14" />
+            </Border>
+        </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text;
 using ASPLeadMapInsightsAPI.Data;
 using ASPLeadMapInsightsAPI.Services;
@@ -8,9 +9,17 @@ using Microsoft.IdentityModel.Tokens;
 
 // --- Auth-only API: login, register, JWT issuance. Same DB as Data API for Identity. ---
 var builder = WebApplication.CreateBuilder(args);
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ASPNETCORE_URLS")))
+    builder.WebHost.UseUrls("http://0.0.0.0:5203");
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// LocalDB is Windows-only; on Linux use SQL Server (env or default).
+if (connectionString.Contains("(localdb)", StringComparison.OrdinalIgnoreCase) && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+{
+    connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+        ?? "Server=localhost,1433;Database=LeafMapInsights;User Id=sa;Password=SuperAdmin2026;TrustServerCertificate=True;";
+}
 builder.Services.AddDbContext<LeafMapDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -85,7 +94,7 @@ using (var scope = app.Services.CreateScope())
     // Admin credentials – configurable via appsettings, with safe defaults for development.
     var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     var adminEmail = config["Admin:Email"] ?? "admin@leafmap.local";
-    var adminPassword = config["Admin:Password"] ?? "Admin123!";
+    var adminPassword = config["Admin:Password"] ?? "SuperAdmin2026";
 
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)

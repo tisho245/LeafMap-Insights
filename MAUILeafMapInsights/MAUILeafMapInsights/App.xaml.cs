@@ -1,56 +1,69 @@
+using System.Diagnostics;
+
 namespace MAUILeafMapInsights
 {
     public partial class App : Application
     {
         public App()
         {
-            InitializeComponent();
-            // Прихващаме необработени изключения – при краш без предупреждение поне да се изпише грешката.
-            AppDomain.CurrentDomain.UnhandledException += (_, e) =>
-            {
-                var ex = (Exception)e.ExceptionObject;
-                System.Diagnostics.Debug.WriteLine($"UnhandledException: {ex}");
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    try
-                    {
-                        var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
-                        page?.DisplayAlert("Грешка", ex.ToString(), "OK");
-                    }
-                    catch { }
-                });
-            };
-            TaskScheduler.UnobservedTaskException += (_, e) =>
-            {
-                System.Diagnostics.Debug.WriteLine($"UnobservedTaskException: {e.Exception}");
-                e.SetObserved();
-            };
-        }
-
-        /// <summary>При създаване на прозореца – AppServices.Services вече е зададен в MauiProgram след Build().</summary>
-        protected override Window CreateWindow(IActivationState? activationState)
-        {
+            StartupLog.Info("App() start");
             try
             {
-                if (AppServices.Services == null && activationState?.Context?.Services is IServiceProvider sp)
-                    AppServices.Services = sp;
-                if (AppServices.Services == null)
-                    System.Diagnostics.Debug.WriteLine("MAUI CreateWindow: AppServices.Services is still null – DI may fail.");
-                return new Window(new AppShell());
+                InitializeComponent();
+                StartupLog.Info("App() InitializeComponent done");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"CreateWindow failed: {ex}");
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    try
-                    {
-                        var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
-                        page?.DisplayAlert("Грешка при старт", ex.Message, "OK");
-                    }
-                    catch { }
-                });
+                StartupLog.Error(ex);
                 throw;
+            }
+        }
+
+        public App(IServiceProvider services) : this()
+        {
+            StartupLog.Info("App(IServiceProvider) setting Services");
+            AppServices.Services = services;
+        }
+
+        protected override Window CreateWindow(IActivationState? activationState)
+        {
+            StartupLog.Info("CreateWindow start");
+            if (AppServices.Services == null && activationState?.Context?.Services is IServiceProvider sp)
+            {
+                AppServices.Services = sp;
+                StartupLog.Info("CreateWindow: Services set from activationState");
+            }
+
+            try
+            {
+                StartupLog.Info("CreateWindow: creating AppShell");
+                var shell = new AppShell();
+                StartupLog.Info("CreateWindow: AppShell created");
+                return new Window(shell);
+            }
+            catch (Exception ex)
+            {
+                StartupLog.Error(ex);
+                try
+                {
+                    var errorPage = new ContentPage
+                    {
+                        Content = new ScrollView
+                        {
+                            Content = new VerticalStackLayout
+                            {
+                                new Label { Text = "Startup error – see log: " + StartupLog.LogPath, FontSize = 18, LineBreakMode = LineBreakMode.WordWrap },
+                                new Label { Text = ex.ToString(), LineBreakMode = LineBreakMode.WordWrap, FontSize = 12 }
+                            }
+                        }
+                    };
+                    return new Window(errorPage);
+                }
+                catch (Exception ex2)
+                {
+                    StartupLog.Error("Error page failed: " + ex2);
+                    throw;
+                }
             }
         }
     }

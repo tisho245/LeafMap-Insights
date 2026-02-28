@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Таксономия — LeafMap Insights</title>
+  <link rel="icon" href="logo.png" type="image/png" sizes="32x32">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="taxonomy.css" />
+</head>
+
+<body data-page="taxonomy">
+  <div class="bg-leaf-canvas" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo">
+        <a href="index.html" class="logo-link" aria-label="LeafMap Insights - Начало">
+          <img src="logo.png" alt="LeafMap Insights" class="logo-img" />
+        </a>
+      </h1>
+
+      <button class="burger" id="btnBurger" type="button"
+              aria-label="Отвори меню" aria-expanded="false" aria-controls="siteNav">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav" id="siteNav" aria-label="Основна навигация">
+        <div class="nav-mobile-head">
+          <span class="nav-mobile-title">Меню</span>
+          <button type="button" class="nav-close" id="btnNavClose" aria-label="Затвори меню">✕</button>
+        </div>
+
+        <a href="index.html" class="nav-link nav-btn">Начало</a>
+        <a href="trees.html" class="nav-link nav-btn">Дървета</a>
+        <a href="map.html" class="nav-link nav-btn">Карта</a>
+        <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
+        <a href="add-tree.html" class="nav-link nav-btn nav-btn-accent" id="addTreeLink" hidden>Добави дърво</a>
+
+        <span class="nav-auth" id="navAuth">
+          <span class="auth-status-text">Не сте влезли</span>
+          <span class="auth-badge" id="authBadge" hidden><span class="badge-dot"></span> Влезли сте като: <span id="userEmail" class="user-email"></span></span>
+          <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
+          <a href="register.html" class="btn btn-ghost" id="btnRegister">Регистрация</a>
+          <a href="admin.html" class="btn btn-ghost" id="adminLink" hidden>Админ</a>
+          <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="nav-overlay" id="navOverlay" hidden></div>
+
+  <main class="main">
+    <div class="taxonomy-head">
+      <div>
+        <h2 class="view-title">Таксономия</h2>
+        <p class="taxonomy-subtitle">Преглед на йерархията: отдел → клас → семейство → род → вид.</p>
+      </div>
+
+      <div class="taxonomy-tools">
+        <label class="tax-search">
+          <span class="tax-search-icon" aria-hidden="true">🔎</span>
+          <input id="taxSearch" type="search" placeholder="Търси (напр. Quercus, Pinus, Rosaceae)..." autocomplete="off" />
+        </label>
+
+        <div class="tax-chips" role="tablist" aria-label="Филтър по секция">
+          <button class="chip active" type="button" data-target="taxDivisions">Отдели</button>
+          <button class="chip" type="button" data-target="taxClasses">Класове</button>
+          <button class="chip" type="button" data-target="taxFamilies">Семейства</button>
+          <button class="chip" type="button" data-target="taxGenera">Родове</button>
+          <button class="chip" type="button" data-target="taxSpecies">Видове</button>
+          <button class="chip chip-ghost" type="button" data-target="all">Всички</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="taxonomy-grid">
+      <section class="taxonomy-card" data-section="taxDivisions">
+        <header class="tax-card-head">
+          <h3>Отдели (Divisions)</h3>
+          <span class="count-pill" id="countDivisions">—</span>
+        </header>
+        <div id="taxDivisions" class="taxonomy-list"></div>
+      </section>
+
+      <section class="taxonomy-card" data-section="taxClasses">
+        <header class="tax-card-head">
+          <h3>Класове (Taxonomy Classes)</h3>
+          <span class="count-pill" id="countClasses">—</span>
+        </header>
+        <div id="taxClasses" class="taxonomy-list"></div>
+      </section>
+
+      <section class="taxonomy-card" data-section="taxFamilies">
+        <header class="tax-card-head">
+          <h3>Семейства (Families)</h3>
+          <span class="count-pill" id="countFamilies">—</span>
+        </header>
+        <div id="taxFamilies" class="taxonomy-list"></div>
+      </section>
+
+      <section class="taxonomy-card" data-section="taxGenera">
+        <header class="tax-card-head">
+          <h3>Родове (Genera)</h3>
+          <span class="count-pill" id="countGenera">—</span>
+        </header>
+        <div id="taxGenera" class="taxonomy-list"></div>
+      </section>
+
+      <section class="taxonomy-card" data-section="taxSpecies">
+        <header class="tax-card-head">
+          <h3>Видове (Species)</h3>
+          <span class="count-pill" id="countSpecies">—</span>
+        </header>
+        <div id="taxSpecies" class="taxonomy-list"></div>
+      </section>
+    </div>
+
+    <div class="taxonomy-state">
+      <div id="taxonomyLoading" class="loading">Зареждане на таксономия...</div>
+      <div id="taxonomyError" class="error-msg" hidden></div>
+    </div>
+
+    <div id="taxModal" class="modal-overlay" hidden>
+      <div class="modal-box">
+        <h3 id="taxModalTitle">Таксономия</h3>
+        <form id="taxModalForm">
+          <input type="hidden" id="taxModalEndpoint" value="">
+          <input type="hidden" id="taxModalId" value="">
+          <div class="form-row">
+            <label for="taxModalName">Име</label>
+            <input type="text" id="taxModalName" required placeholder="Име">
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Запази</button>
+            <button type="button" class="btn btn-ghost" id="taxModalClose">Отказ</button>
+          </div>
+        </form>
+        <div id="taxModalError" class="error-msg" hidden></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>LeafMap Insights</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6/dist/axios.min.js"></script>
+  <script src="app.js"></script>
+
+  <!-- Page-only JS (no changes to app.js) -->
+  <script>
+    (function () {
+      const search = document.getElementById('taxSearch');
+      const chips = document.querySelectorAll('.chip');
+      const cards = document.querySelectorAll('.taxonomy-card');
+
+      function norm(s){ return (s || '').toLowerCase().trim(); }
+
+      function updateCounts() {
+        const map = [
+          ['taxDivisions','countDivisions'],
+          ['taxClasses','countClasses'],
+          ['taxFamilies','countFamilies'],
+          ['taxGenera','countGenera'],
+          ['taxSpecies','countSpecies'],
+        ];
+        map.forEach(([listId, pillId]) => {
+          const list = document.getElementById(listId);
+          const pill = document.getElementById(pillId);
+          if (!list || !pill) return;
+          const items = list.querySelectorAll('li');
+          pill.textContent = items.length ? items.length : '0';
+        });
+      }
+
+      function filterLists() {
+        const q = norm(search ? search.value : '');
+        cards.forEach(card => {
+          const list = card.querySelector('.taxonomy-list');
+          const items = list ? list.querySelectorAll('li') : [];
+          let any = false;
+          items.forEach(li => {
+            const ok = !q || norm(li.textContent).includes(q);
+            li.hidden = !ok;
+            if (ok) any = true;
+          });
+          // hide card only when search is active AND it has no visible matches
+          card.classList.toggle('card-dim', !!q && !any);
+        });
+      }
+
+      function activate(target) {
+        chips.forEach(c => c.classList.toggle('active', c.dataset.target === target));
+        if (target === 'all') {
+          cards.forEach(c => c.hidden = false);
+          return;
+        }
+        cards.forEach(c => c.hidden = c.dataset.section !== target);
+      }
+
+      // Re-check counts after app.js populates the lists
+      const loadingEl = document.getElementById('taxonomyLoading');
+      const obs = new MutationObserver(() => {
+        // when any list changes, update counters + apply search filter
+        updateCounts();
+        filterLists();
+      });
+      ['taxDivisions','taxClasses','taxFamilies','taxGenera','taxSpecies'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) obs.observe(el, { childList: true, subtree: true });
+      });
+
+      chips.forEach(btn => btn.addEventListener('click', () => activate(btn.dataset.target)));
+      if (search) search.addEventListener('input', filterLists);
+
+      // default view: all cards
+      activate('all');
+
+      // if loading text disappears (hidden), do a final count update
+      if (loadingEl) {
+        const obs2 = new MutationObserver(() => { updateCounts(); filterLists(); });
+        obs2.observe(loadingEl, { attributes: true, attributeFilter: ['hidden'] });
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+.detail-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.back-btn {
+  padding-left: 0.95rem;
+  padding-right: 0.95rem;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.detail-shell {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.70));
+  box-shadow: var(--shadow);
+  padding: 1.1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.detail-shell::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background:
+    radial-gradient(900px 340px at 10% 0%, rgba(123, 211, 137, 0.18), transparent 60%),
+    radial-gradient(820px 320px at 90% 30%, rgba(31, 122, 77, 0.12), transparent 60%),
+    radial-gradient(780px 340px at 50% 120%, rgba(10, 160, 110, 0.10), transparent 60%);
+  opacity: 0.95;
+  z-index: 0;
+}
+
+.detail-shell > * { position: relative; z-index: 1; }
+
+.tree-detail-card {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(11, 31, 20, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-soft);
+  max-width: 720px;
+}
+
+.tree-detail-card h2 {
+  margin: 0 0 0.85rem 0;
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  letter-spacing: 0.01em;
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 0.55rem 1.2rem;
+  margin: 0;
+  align-items: start;
+}
+
+.detail-list dt {
+  color: var(--muted);
+  font-weight: 900;
+  font-size: 0.95rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 12px;
+  background: rgba(11, 31, 20, 0.04);
+  border: 1px solid rgba(11, 31, 20, 0.06);
+}
+
+.detail-list dd {
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(11, 31, 20, 0.08);
+  color: rgba(11, 31, 20, 0.92);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+/* Снимка на дървото в детайлите */
+.tree-detail-photo {
+  margin-top: 1.25rem;
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+  border: 1px solid rgba(11, 31, 20, 0.1);
+  background: rgba(11, 31, 20, 0.03);
+}
+
+.tree-detail-img {
+  display: block;
+  max-width: 100%;
+  width: auto;
+  max-height: 320px;
+  height: auto;
+  object-fit: contain;
+}
+
+.detail-shell .loading,
+.detail-shell .error-msg {
+  margin-top: 1rem;
+}
+
+.btn-sm {
+  padding: 0.5rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 740px) {
+  .detail-list { grid-template-columns: 1fr; }
+  .detail-list dt { width: fit-content; }
+  .tree-detail-card { padding: 1.05rem; }
+}

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Админ – Потребители — LeafMap Insights</title>
+  <link rel="icon" href="logo.png" type="image/png" sizes="32x32">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+
+<body data-page="admin">
+  <div class="bg-leaf-canvas" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="logo">
+        <a href="index.html" class="logo-link" aria-label="LeafMap Insights - Начало">
+          <img src="logo.png" alt="LeafMap Insights" class="logo-img" />
+        </a>
+      </h1>
+
+      <button class="burger" id="btnBurger" type="button"
+              aria-label="Отвори меню" aria-expanded="false" aria-controls="siteNav">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav" id="siteNav" aria-label="Основна навигация">
+        <div class="nav-mobile-head">
+          <span class="nav-mobile-title">Меню</span>
+          <button type="button" class="nav-close" id="btnNavClose" aria-label="Затвори меню">✕</button>
+        </div>
+
+        <a href="index.html" class="nav-link nav-btn">Начало</a>
+        <a href="trees.html" class="nav-link nav-btn">Дървета</a>
+        <a href="map.html" class="nav-link nav-btn">Карта</a>
+        <a href="taxonomy.html" class="nav-link nav-btn">Таксономия</a>
+        <a href="add-tree.html" class="nav-link nav-btn nav-btn-accent" id="addTreeLink" hidden>Добави дърво</a>
+
+        <span class="nav-auth" id="navAuth">
+          <span class="auth-status-text">Не сте влезли</span>
+          <span class="auth-badge" id="authBadge" hidden><span class="badge-dot"></span> Влезли сте като: <span id="userEmail" class="user-email"></span></span>
+          <a href="login.html" class="btn btn-ghost" id="btnLogin">Вход</a>
+          <a href="register.html" class="btn btn-ghost" id="btnRegister">Регистрация</a>
+          <a href="admin.html" class="btn btn-ghost" id="adminLink" hidden>Админ</a>
+          <button type="button" class="btn btn-ghost" id="btnLogout" hidden>Изход</button>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <div class="nav-overlay" id="navOverlay" hidden></div>
+
+  <main class="main">
+    <div class="admin-head">
+      <div>
+        <h2 class="view-title">Админ – Потребители</h2>
+        <p class="admin-subtitle">Списък с потребители и роли. Достъпно само за роля <strong>Admin</strong>.</p>
+      </div>
+
+      <div class="admin-tools">
+        <label class="admin-search">
+          <span class="admin-search-icon" aria-hidden="true">🔎</span>
+          <input id="userSearch" type="search" placeholder="Търси по email / роля..." autocomplete="off" />
+        </label>
+
+        <div class="admin-count" id="userCount">—</div>
+      </div>
+    </div>
+
+    <section class="admin-shell">
+      <div id="usersLoading" class="loading">Зареждане...</div>
+      <div id="usersError" class="error-msg" hidden></div>
+      <div id="usersList"></div>
+    </section>
+
+    <div id="userModal" class="modal-overlay" hidden>
+      <div class="modal-box modal-box-wide">
+        <h3 id="userModalTitle">Потребител</h3>
+        <form id="userForm">
+          <input type="hidden" id="userId" value="">
+          <div class="form-row">
+            <label for="userNameInput">Потребителско име</label>
+            <input type="text" id="userNameInput" required placeholder="username">
+          </div>
+          <div class="form-row">
+            <label for="userEmailInput">Имейл</label>
+            <input type="email" id="userEmailInput" placeholder="user@example.com">
+          </div>
+          <div class="form-row" id="userPasswordRow">
+            <label for="userPassword">Парола</label>
+            <input type="password" id="userPassword" placeholder="Само при създаване">
+          </div>
+          <div class="form-row">
+            <label for="userPhoneInput">Телефон</label>
+            <input type="text" id="userPhoneInput" placeholder="+359...">
+          </div>
+          <div class="form-row form-row-inline">
+            <label><input type="checkbox" id="userEmailConfirmed"> Имейл потвърден</label>
+          </div>
+          <div class="form-row form-row-inline">
+            <label><input type="checkbox" id="userPhoneNumberConfirmed"> Телефон потвърден</label>
+          </div>
+          <div class="form-row form-row-inline">
+            <label><input type="checkbox" id="userTwoFactorEnabled"> Двуфакторна автентикация</label>
+          </div>
+          <div class="form-row form-row-inline">
+            <label><input type="checkbox" id="userLockoutEnabled"> Блокиране разрешено</label>
+          </div>
+          <div class="form-row">
+            <label for="userLockoutEnd">Блокиран до (дата/час, празно = не блокиран)</label>
+            <input type="datetime-local" id="userLockoutEnd" placeholder="">
+          </div>
+          <div class="form-row">
+            <label for="userRoles">Роли (разделени със запетая)</label>
+            <input type="text" id="userRoles" placeholder="User, Admin">
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Запази</button>
+            <button type="button" class="btn btn-ghost" id="userModalClose">Отказ</button>
+          </div>
+        </form>
+        <div id="userModalError" class="error-msg" hidden></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>LeafMap Insights</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6/dist/axios.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
