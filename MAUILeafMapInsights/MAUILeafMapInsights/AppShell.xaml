@@ -7,24 +7,17 @@
     Shell.FlyoutBehavior="Flyout"
     Title="LeafMap Insights">
 
-    <!-- Меню като node client: закръглени редове, меки цветове от темата -->
+    <!-- Меню – тъмен текст явно зададен за четимост на всички платформи -->
     <Shell.ItemTemplate>
         <DataTemplate x:DataType="FlyoutItem">
-            <Border Margin="12,4" Padding="16,14" StrokeThickness="1" Stroke="{StaticResource Border}"
-                    BackgroundColor="{StaticResource Surface}" VerticalOptions="Center">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="16" />
-                </Border.StrokeShape>
-                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14">
-                    <Image Source="{Binding FlyoutIcon}" WidthRequest="24" HeightRequest="24"
-                           VerticalOptions="Center" Grid.Column="0" />
-                    <Label Text="{Binding Title}" Grid.Column="1"
-                           FontSize="16" FontAttributes="None"
-                           TextColor="{StaticResource Text}"
-                           VerticalOptions="Center"
-                           LineBreakMode="WordWrap" MaxLines="2" />
-                </Grid>
-            </Border>
+            <Grid Padding="20,14" ColumnDefinitions="Auto,*" ColumnSpacing="12" MinimumHeightRequest="48"
+                  BackgroundColor="{StaticResource Background}">
+                <Image Source="{Binding FlyoutIcon}" WidthRequest="24" HeightRequest="24"
+                       VerticalOptions="Center" Grid.Column="0" />
+                <Label Text="{Binding Title}" Grid.Column="1" FontSize="16"
+                       TextColor="#0B1F14" VerticalOptions="Center"
+                       LineBreakMode="WordWrap" MaxLines="2" />
+            </Grid>
         </DataTemplate>
     </Shell.ItemTemplate>
 
@@ -59,9 +52,7 @@
         <ShellContent Route="Taxonomy" ContentTemplate="{DataTemplate pages:TaxonomyPage}" />
     </FlyoutItem>
 
-    <FlyoutItem x:Name="AddTreeFlyoutItem" Title="Добави дърво" Icon="logo.png" IsVisible="False">
-        <ShellContent Route="AddTree" ContentTemplate="{DataTemplate pages:AddTreePage}" />
-    </FlyoutItem>
+    <!-- Добави дърво – само от бутон на страница Дървета (само за логнати), не от меню -->
 
     <FlyoutItem x:Name="NewUserFlyoutItem" Title="Нов потребител" Icon="logo.png" IsVisible="False">
         <ShellContent Route="NewUser" ContentTemplate="{DataTemplate pages:AdminUserEditPage}" />
@@ -85,7 +76,8 @@
         <ShellContent Route="Logout" ContentTemplate="{DataTemplate pages:LoginPage}" />
     </FlyoutItem>
 
-    <!-- Маршрути за навигация, не са в менюто -->
+    <!-- Маршрути за навигация, не са в менюто (достъп от бутони) -->
+    <ShellContent Route="AddTree" ContentTemplate="{DataTemplate pages:AddTreePage}" />
     <ShellContent Route="TreeDetail" ContentTemplate="{DataTemplate pages:TreeDetailPage}" />
     <ShellContent Route="AdminUserEdit" ContentTemplate="{DataTemplate pages:AdminUserEditPage}" />
     <ShellContent Route="EditTree" ContentTemplate="{DataTemplate pages:EditTreePage}" />

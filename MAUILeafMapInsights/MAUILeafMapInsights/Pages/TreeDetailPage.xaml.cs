@@ -44,9 +44,11 @@ public partial class TreeDetailPage : ContentPage
             {
                 ContentStack.Children.Clear();
                 ContentStack.Children.Add(new Label { Text = "Дървото не е намерено.", TextColor = (Color)(Application.Current?.Resources["Muted"] ?? Colors.Gray) });
+                EditTreeButton.IsVisible = false;
                 return;
             }
 
+            EditTreeButton.IsVisible = await Auth.IsAdminAsync();
             FillContent(tree);
         }
         catch (Exception ex)
@@ -100,6 +102,12 @@ public partial class TreeDetailPage : ContentPage
             catch { return null; }
         }
         return url;
+    }
+
+    private async void OnEditTreeClicked(object? sender, EventArgs e)
+    {
+        if (_currentTreeId <= 0) return;
+        await Shell.Current.GoToAsync($"EditTree?id={_currentTreeId}");
     }
 
     private async void OnAddPhotoClicked(object? sender, EventArgs e)

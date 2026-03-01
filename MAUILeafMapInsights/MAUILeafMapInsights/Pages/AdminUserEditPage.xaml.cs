@@ -61,7 +61,12 @@ public partial class AdminUserEditPage : ContentPage
             var password = PasswordEntry.Text ?? "";
             if (string.IsNullOrEmpty(password)) { ErrorLabel.Text = "Въведете парола."; ErrorLabel.IsVisible = true; return; }
             var (ok, err) = await Api.CreateUserAsync(new CreateUserRequest { UserName = userName, Email = email, Password = password, Roles = roles });
-            if (ok) { await Shell.Current.GoToAsync(".."); return; }
+            if (ok)
+            {
+                await DisplayAlert("Готово", "Потребителят е създаден успешно.", "OK");
+                await Shell.Current.GoToAsync("..");
+                return;
+            }
             ErrorLabel.Text = err ?? "Грешка при създаване.";
             ErrorLabel.IsVisible = true;
         }

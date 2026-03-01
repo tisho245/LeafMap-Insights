@@ -22,7 +22,7 @@
                             </Border>
 
                             <Border StyleClass="Field">
-                                <Entry x:Name="UserNameEntry" Placeholder="Потребителско име (по избор)" />
+                                <Entry x:Name="UserNameEntry" Placeholder="Потребителско име" />
                             </Border>
 
                             <Label x:Name="ErrorLabel" TextColor="{StaticResource Error}" IsVisible="False" />

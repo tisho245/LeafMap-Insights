@@ -18,6 +18,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("NewUser", typeof(AdminUserEditPage));
         Routing.RegisterRoute("Logout", typeof(LoginPage));
         Routing.RegisterRoute("EditTree", typeof(EditTreePage));
+        Routing.RegisterRoute("AddTree", typeof(AddTreePage));
         Navigating += OnShellNavigating;
         StartupLog.Info("AppShell() done");
     }
@@ -29,7 +30,6 @@ public partial class AppShell : Shell
         var logged = await auth.IsLoggedInAsync();
         var isAdmin = await auth.IsAdminAsync();
 
-        AddTreeFlyoutItem.IsVisible = logged;
         NewUserFlyoutItem.IsVisible = isAdmin;
         AdminFlyoutItem.IsVisible = isAdmin;
 

@@ -11,7 +11,10 @@
                     <VerticalStackLayout Spacing="8">
                         <Label Text="Детайли за дърво" StyleClass="PageTitle" TextColor="{StaticResource Text}" />
                         <Label Text="Таксономия, координати и описание." StyleClass="PageSubtitle" TextColor="{StaticResource Muted}" />
-                        <Button x:Name="AddPhotoButton" Text="Добави снимка" Clicked="OnAddPhotoClicked" StyleClass="SecondaryButton" Margin="0,8,0,0" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,8,0,0">
+                            <Button x:Name="AddPhotoButton" Text="Добави снимка" Clicked="OnAddPhotoClicked" StyleClass="SecondaryButton" Grid.Column="0" />
+                            <Button x:Name="EditTreeButton" Text="Редактирай дърво" Clicked="OnEditTreeClicked" StyleClass="SecondaryButton" Grid.Column="1" IsVisible="False" />
+                        </Grid>
                         <VerticalStackLayout x:Name="ContentStack" Spacing="8" Margin="0,12,0,0" />
                     </VerticalStackLayout>
                 </Border>

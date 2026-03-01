@@ -42,6 +42,17 @@
 
 		<!-- Изключване на Fast Deployment за Android – избягва XA0129 при deploy на някои устройства/емулатори -->
 		<EmbedAssembliesIntoApk Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">true</EmbedAssembliesIntoApk>
+
+		<!-- Android: фон на иконката да е светъл (PNG с прозрачност иначе става черен) -->
+		<AndroidIconBackgroundColor Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">#F7FBF7</AndroidIconBackgroundColor>
+
+		<!-- Винаги изход APK (не AAB) и подписан за инсталиране на телефон; Release използва debug keystore ако няма свой -->
+		<AndroidPackageFormat Condition="'$(TargetFramework)' == 'net9.0-android'">apk</AndroidPackageFormat>
+		<AndroidSigningKeyStore Condition="'$(TargetFramework)' == 'net9.0-android' and '$(Configuration)' == 'Release' and '$(AndroidSigningKeyStore)' == ''">$(USERPROFILE)\.android\debug.keystore</AndroidSigningKeyStore>
+		<AndroidSigningKeyStorePassword Condition="'$(TargetFramework)' == 'net9.0-android' and '$(Configuration)' == 'Release' and '$(AndroidSigningKeyStore)' == ''">android</AndroidSigningKeyStorePassword>
+		<AndroidSigningKeyAlias Condition="'$(TargetFramework)' == 'net9.0-android' and '$(Configuration)' == 'Release' and '$(AndroidSigningKeyStore)' == ''">androiddebugkey</AndroidSigningKeyAlias>
+		<AndroidSigningKeyPass Condition="'$(TargetFramework)' == 'net9.0-android' and '$(Configuration)' == 'Release' and '$(AndroidSigningKeyStore)' == ''">android</AndroidSigningKeyPass>
+		<AndroidSigningStorePass Condition="'$(TargetFramework)' == 'net9.0-android' and '$(Configuration)' == 'Release' and '$(AndroidSigningKeyStore)' == ''">android</AndroidSigningStorePass>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -73,5 +84,17 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
+
+	<!-- При всеки Android билд копирай APK в папка APK за лесно тестване на телефон -->
+	<Target Name="CopyApkForDevice" AfterTargets="Build" Condition="'$(TargetFramework)' == 'net9.0-android'">
+		<PropertyGroup>
+			<_ApkDir>$(MSBuildProjectDirectory)\APK</_ApkDir>
+			<_DestApk>$(_ApkDir)\LeafMapInsights-$(Configuration).apk</_DestApk>
+		</PropertyGroup>
+		<MakeDir Directories="$(_ApkDir)" Condition="!Exists('$(_ApkDir)')" />
+		<Copy SourceFiles="$(OutputPath)$(ApplicationId)-Signed.apk" DestinationFiles="$(_DestApk)" Condition="Exists('$(OutputPath)$(ApplicationId)-Signed.apk')" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="$(OutputPath)$(ApplicationId).apk" DestinationFiles="$(_DestApk)" Condition="!Exists('$(OutputPath)$(ApplicationId)-Signed.apk') and Exists('$(OutputPath)$(ApplicationId).apk')" SkipUnchangedFiles="true" />
+		<Message Importance="high" Text="APK за телефон: $(_DestApk)" />
+	</Target>
 
 </Project>

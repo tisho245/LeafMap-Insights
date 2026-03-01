@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35707.178 d17.12
@@ -8,13 +8,23 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|Android = Debug|Android
 		Release|Any CPU = Release|Any CPU
+		Release|Android = Release|Android
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{07B5B40D-377D-48D2-9152-5F21E5A23AAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{07B5B40D-377D-48D2-9152-5F21E5A23AAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07B5B40D-377D-48D2-9152-5F21E5A23AAF}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{07B5B40D-377D-48D2-9152-5F21E5A23AAF}.Debug|Android.ActiveCfg = Debug|Any CPU
+		{07B5B40D-377D-48D2-9152-5F21E5A23AAF}.Debug|Android.Build.0 = Debug|Any CPU
+		{07B5B40D-377D-48D2-9152-5F21E5A23AAF}.Debug|Android.Deploy.0 = Debug|Any CPU
 		{07B5B40D-377D-48D2-9152-5F21E5A23AAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07B5B40D-377D-48D2-9152-5F21E5A23AAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07B5B40D-377D-48D2-9152-5F21E5A23AAF}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{07B5B40D-377D-48D2-9152-5F21E5A23AAF}.Release|Android.ActiveCfg = Release|Any CPU
+		{07B5B40D-377D-48D2-9152-5F21E5A23AAF}.Release|Android.Build.0 = Release|Any CPU
+		{07B5B40D-377D-48D2-9152-5F21E5A23AAF}.Release|Android.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

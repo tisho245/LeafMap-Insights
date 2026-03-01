@@ -62,6 +62,14 @@ public class LeafMapApiService
         return await GetAsync<List<TreeDto>>(path, ct);
     }
 
+    /// <summary>Дървета в видимите граници на картата (minLat, minLng, maxLat, maxLng).</summary>
+    public async Task<List<TreeDto>?> GetTreesWithinBoundsAsync(double minLat, double minLng, double maxLat, double maxLng, CancellationToken ct = default)
+    {
+        await EnsureTokenAsync();
+        var path = $"api/trees/WithinBounds?minLat={minLat.ToString(System.Globalization.CultureInfo.InvariantCulture)}&minLng={minLng.ToString(System.Globalization.CultureInfo.InvariantCulture)}&maxLat={maxLat.ToString(System.Globalization.CultureInfo.InvariantCulture)}&maxLng={maxLng.ToString(System.Globalization.CultureInfo.InvariantCulture)}&includeLookups=true";
+        return await GetAsync<List<TreeDto>>(path, ct);
+    }
+
     /// <summary>Едно дърво по id.</summary>
     public async Task<TreeDto?> GetTreeAsync(int id, CancellationToken ct = default)
     {
@@ -69,13 +77,42 @@ public class LeafMapApiService
         return await GetAsync<TreeDto>($"api/trees/{id}?includeLookups=true", ct);
     }
 
-    /// <summary>Обновява съществуващо дърво – PUT api/trees/{id}. Изисква валиден JWT (логнат потребител или админ).</summary>
+    /// <summary>Обновява съществуващо дърво – PUT api/trees/{id}. Изисква валиден JWT. API очаква camelCase.</summary>
     public async Task<bool> UpdateTreeAsync(int id, TreeDto tree, CancellationToken ct = default)
     {
+        var (ok, _) = await UpdateTreeWithErrorAsync(id, tree, ct);
+        return ok;
+    }
+
+    /// <summary>Същото като UpdateTreeAsync, но при грешка връща съобщението от сървъра. Изпращаме Genus, Family и др. като обекти с Id (PascalCase), както очаква валидацията.</summary>
+    public async Task<(bool success, string? error)> UpdateTreeWithErrorAsync(int id, TreeDto tree, CancellationToken ct = default)
+    {
         await EnsureTokenAsync();
-        var body = JsonSerializer.Serialize(tree);
+        var payload = new Dictionary<string, object?>
+        {
+            ["Id"] = id,
+            ["Name"] = tree.Name,
+            ["PhotoURL"] = tree.PhotoURL,
+            ["Description"] = tree.Description,
+            ["Latitude"] = tree.Latitude,
+            ["Longitude"] = tree.Longitude,
+            ["DivisionId"] = tree.DivisionId,
+            ["TaxonomyClassId"] = tree.TaxonomyClassId,
+            ["GenusId"] = tree.GenusId,
+            ["FamilyId"] = tree.FamilyId,
+            ["SpeciesId"] = tree.SpeciesId,
+            ["Division"] = new Dictionary<string, object> { ["Id"] = tree.DivisionId },
+            ["TaxonomyClass"] = new Dictionary<string, object> { ["Id"] = tree.TaxonomyClassId },
+            ["Genus"] = new Dictionary<string, object> { ["Id"] = tree.GenusId },
+            ["Family"] = new Dictionary<string, object> { ["Id"] = tree.FamilyId },
+            ["Species"] = new Dictionary<string, object> { ["Id"] = tree.SpeciesId }
+        };
+        var jsonOpt = new JsonSerializerOptions { PropertyNamingPolicy = null, WriteIndented = false };
+        var body = JsonSerializer.Serialize(payload, jsonOpt);
         var res = await _http.PutAsync($"api/trees/{id}", new StringContent(body, Encoding.UTF8, "application/json"), ct);
-        return res.IsSuccessStatusCode;
+        if (res.IsSuccessStatusCode) return (true, null);
+        var err = await res.Content.ReadAsStringAsync(ct);
+        return (false, string.IsNullOrWhiteSpace(err) ? res.ReasonPhrase : err);
     }
 
     /// <summary>Създава ново дърво – POST api/trees. Изисква валиден JWT.</summary>

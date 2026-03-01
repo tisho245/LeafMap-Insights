@@ -7,6 +7,8 @@ namespace MAUILeafMapInsights.Pages;
 public partial class AdminPage : ContentPage
 {
     private LeafMapApiService? _api;
+    private int _lastSectionIndex = -1;
+    private bool _isLoadingSection;
     private const int SectUsers = 0, SectTrees = 1, SectDivisions = 2, SectClasses = 3, SectFamilies = 4, SectGenera = 5, SectSpecies = 6;
 
     public AdminPage()
@@ -21,10 +23,19 @@ public partial class AdminPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
+        var idx = SectionPicker.SelectedIndex >= 0 ? SectionPicker.SelectedIndex : 0;
+        _lastSectionIndex = idx;
         LoadSection();
     }
 
-    private void OnSectionChanged(object? sender, EventArgs e) => LoadSection();
+    private void OnSectionChanged(object? sender, EventArgs e)
+    {
+        var idx = SectionPicker.SelectedIndex;
+        if (idx < 0) return;
+        if (idx == _lastSectionIndex) return;
+        _lastSectionIndex = idx;
+        LoadSection();
+    }
 
     private async void OnRefreshing(object? sender, EventArgs e)
     {
@@ -39,6 +50,8 @@ public partial class AdminPage : ContentPage
 
     private async Task LoadSectionAsync()
     {
+        if (_isLoadingSection) return;
+        _isLoadingSection = true;
         var idx = SectionPicker.SelectedIndex;
         if (idx < 0) idx = 0;
         LoadingLabel.IsVisible = true;
@@ -120,6 +133,10 @@ public partial class AdminPage : ContentPage
             LoadingLabel.IsVisible = false;
             ErrorLabel.Text = ex.Message;
             ErrorLabel.IsVisible = true;
+        }
+        finally
+        {
+            _isLoadingSection = false;
         }
     }
 

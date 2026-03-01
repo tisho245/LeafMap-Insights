@@ -7,9 +7,10 @@
 
     <Grid RowDefinitions="Auto,*">
         <VerticalStackLayout Grid.Row="0" Padding="20,16" Spacing="4">
-            <Grid ColumnDefinitions="*,Auto">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                 <Label Text="Дървета" StyleClass="PageTitle" TextColor="{StaticResource Text}" VerticalOptions="Center" />
-                <Button Grid.Column="1" Text="Обнови" Clicked="OnRefreshClicked" StyleClass="SecondaryButton" />
+                <Button x:Name="AddTreeButton" Grid.Column="1" Text="Добави дърво" Clicked="OnAddTreeClicked" StyleClass="PrimaryButton" IsVisible="False" />
+                <Button Grid.Column="2" Text="Обнови" Clicked="OnRefreshClicked" StyleClass="SecondaryButton" />
             </Grid>
             <Label Text="Търси и преглеждай записи по вид и координати." StyleClass="PageSubtitle" TextColor="{StaticResource Muted}" />
         </VerticalStackLayout>

@@ -4,10 +4,11 @@ using MAUILeafMapInsights.Services;
 
 namespace MAUILeafMapInsights.Pages;
 
-/// <summary>Списък с дървета от API. При избор на елемент навигира към TreeDetail с id. Поддържа pull-to-refresh.</summary>
+/// <summary>Списък с дървета от API. Бутон „Добави дърво” само за логнати. При избор – навигира към TreeDetail.</summary>
 public partial class TreesPage : ContentPage
 {
     private LeafMapApiService? _api;
+    private AuthService? _auth;
     private ObservableCollection<TreeDto> _trees = new();
 
     public TreesPage()
@@ -18,11 +19,14 @@ public partial class TreesPage : ContentPage
     }
 
     private LeafMapApiService Api => _api ??= AppServices.GetRequired<LeafMapApiService>();
+    private AuthService Auth => _auth ??= AppServices.GetRequired<AuthService>();
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
-        _ = LoadTreesAsync();
+        var logged = await Auth.IsLoggedInAsync();
+        AddTreeButton.IsVisible = logged;
+        await LoadTreesAsync();
     }
 
     /// <summary>Зарежда дърветата чрез GetTreesAsync и попълва ObservableCollection за ListView.</summary>
@@ -49,6 +53,11 @@ public partial class TreesPage : ContentPage
     private void OnRefreshClicked(object? sender, EventArgs e) => _ = LoadTreesAsync();
 
     private async void OnRefreshing(object? sender, EventArgs e) => await LoadTreesAsync();
+
+    private async void OnAddTreeClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("AddTree");
+    }
 
     /// <summary>При избор на дърво от списъка – навигираме към TreeDetail с id като параметър.</summary>
     private async void OnTreeSelected(object? sender, SelectionChangedEventArgs e)

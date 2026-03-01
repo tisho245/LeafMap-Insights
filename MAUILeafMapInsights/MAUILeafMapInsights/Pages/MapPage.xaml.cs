@@ -8,15 +8,11 @@ namespace MAUILeafMapInsights.Pages;
 public partial class MapPage : ContentPage
 {
     private LeafMapApiService? _api;
-    private List<TreeDto>? _pendingTrees;
-    private bool _webViewReady;
 
     public MapPage()
     {
         InitializeComponent();
-        MapWebView.Source = new HtmlWebViewSource { Html = GetMapHtml() };
         MapWebView.Navigating += OnMapWebViewNavigating;
-        MapWebView.Navigated += OnMapWebViewNavigated;
     }
 
     private LeafMapApiService Api => _api ??= AppServices.GetRequired<LeafMapApiService>();
@@ -24,31 +20,42 @@ public partial class MapPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        _ = LoadTreesAsync();
+        _ = LoadTreesAndShowMapAsync();
     }
 
-    private void OnMapWebViewNavigating(object? sender, WebNavigatingEventArgs e)
+    private async void OnMapWebViewNavigating(object? sender, WebNavigatingEventArgs e)
     {
-        if (e.Url?.StartsWith("leafmap://", StringComparison.OrdinalIgnoreCase) == true)
+        if (e.Url?.StartsWith("leafmap://", StringComparison.OrdinalIgnoreCase) != true) return;
+        e.Cancel = true;
+        var uri = new Uri(e.Url);
+        if (uri.Host.Equals("tree", StringComparison.OrdinalIgnoreCase) && uri.Segments.Length > 1 && int.TryParse(uri.Segments[^1].TrimEnd('/'), out var id))
         {
-            e.Cancel = true;
-            var uri = new Uri(e.Url);
-            if (uri.Host.Equals("tree", StringComparison.OrdinalIgnoreCase) && uri.Segments.Length > 1 && int.TryParse(uri.Segments[^1].TrimEnd('/'), out var id))
-                _ = Shell.Current.GoToAsync($"TreeDetail?id={id}");
+            await Shell.Current.GoToAsync($"TreeDetail?id={id}");
+            return;
         }
+        if (uri.Host.Equals("bounds", StringComparison.OrdinalIgnoreCase) && uri.Segments.Length >= 5
+            && double.TryParse(uri.Segments[1].TrimEnd('/'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var minLat)
+            && double.TryParse(uri.Segments[2].TrimEnd('/'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var minLng)
+            && double.TryParse(uri.Segments[3].TrimEnd('/'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var maxLat)
+            && double.TryParse(uri.Segments[4].TrimEnd('/'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var maxLng))
+            await UpdateTreesInMapAsync(minLat, minLng, maxLat, maxLng);
     }
 
-    private async void OnMapWebViewNavigated(object? sender, WebNavigatedEventArgs e)
+    private async Task UpdateTreesInMapAsync(double minLat, double minLng, double maxLat, double maxLng)
     {
-        _webViewReady = true;
-        if (_pendingTrees != null)
+        try
         {
-            await InjectTreesAsync(_pendingTrees);
-            _pendingTrees = null;
+            var list = await Api.GetTreesWithinBoundsAsync(minLat, minLng, maxLat, maxLng);
+            var trees = list ?? new List<TreeDto>();
+            var data = trees.Select(t => new { id = t.Id, name = t.Name ?? "", lat = t.Latitude, lng = t.Longitude }).ToList();
+            var json = JsonSerializer.Serialize(data);
+            await MapWebView.EvaluateJavaScriptAsync($"if(typeof setTrees==='function')setTrees({json});");
         }
+        catch { /* игнорираме при грешка от мрежа */ }
     }
 
-    private async Task LoadTreesAsync()
+    /// <summary>Зарежда дърветата и показва картата с данните вградени в HTML – така маркерите винаги се виждат.</summary>
+    private async Task LoadTreesAndShowMapAsync()
     {
         Loading.IsRunning = true;
         Loading.IsVisible = true;
@@ -56,12 +63,10 @@ public partial class MapPage : ContentPage
         {
             var list = await Api.GetTreesAsync();
             var trees = list ?? new List<TreeDto>();
-            _pendingTrees = trees;
-            if (_webViewReady)
-            {
-                await InjectTreesAsync(trees);
-                _pendingTrees = null;
-            }
+            var data = trees.Select(t => new { id = t.Id, name = t.Name ?? "", lat = t.Latitude, lng = t.Longitude }).ToList();
+            var json = JsonSerializer.Serialize(data);
+            var html = GetMapHtml(json);
+            MapWebView.Source = new HtmlWebViewSource { Html = html };
         }
         finally
         {
@@ -70,26 +75,11 @@ public partial class MapPage : ContentPage
         }
     }
 
-    private async Task InjectTreesAsync(List<TreeDto> trees)
-    {
-        var data = trees.Select(t => new { id = t.Id, name = t.Name ?? "", lat = t.Latitude, lng = t.Longitude }).ToList();
-        var json = JsonSerializer.Serialize(data);
-        var script = "setTrees(" + json + ");";
-        try
-        {
-            await MapWebView.EvaluateJavaScriptAsync(script);
-        }
-        catch
-        {
-            // WebView още не е готов или платформата не поддържа
-        }
-    }
+    private void OnRefreshClicked(object? sender, EventArgs e) => _ = LoadTreesAndShowMapAsync();
 
-    private void OnRefreshClicked(object? sender, EventArgs e) => _ = LoadTreesAsync();
-
-    private static string GetMapHtml()
+    private static string GetMapHtml(string treesJson = "[]")
     {
-        return """
+        const string head = """
 <!DOCTYPE html>
 <html>
 <head>
@@ -125,10 +115,14 @@ function getTreeMarkerIcon() {
 }
 var treeIcon = getTreeMarkerIcon();
 var markers = [];
+var initialTrees = 
+""";
+        const string tail = """
+;
 window.setTrees = function(data) {
+  if (!data) data = initialTrees;
   markers.forEach(function(m){ map.removeLayer(m); });
   markers = [];
-  map.setView(DEFAULT_MAP_CENTER, 12);
   if (!data || data.length === 0) return;
   data.forEach(function(t){
     var m = L.marker([t.lat, t.lng], { icon: treeIcon }).addTo(map).bindPopup((t.name && t.name.length) ? t.name : ('ID ' + t.id));
@@ -136,10 +130,20 @@ window.setTrees = function(data) {
     markers.push(m);
   });
 };
+if (initialTrees && initialTrees.length) window.setTrees(initialTrees);
+var boundsTimeout;
+map.on('moveend', function() {
+  clearTimeout(boundsTimeout);
+  boundsTimeout = setTimeout(function() {
+    var b = map.getBounds();
+    window.location = 'leafmap://bounds/' + b.getSouth() + '/' + b.getWest() + '/' + b.getNorth() + '/' + b.getEast();
+  }, 400);
+});
 })();
 </script>
 </body>
 </html>
 """;
+        return head + treesJson + tail;
     }
 }
