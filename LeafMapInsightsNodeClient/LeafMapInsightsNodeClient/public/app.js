@@ -851,14 +851,37 @@ async function submitEditTree(e) {
     taxonomyClassId: parseInt(document.getElementById('editTreeTaxonomyClassId').value, 10),
     familyId: parseInt(document.getElementById('editTreeFamilyId').value, 10),
     genusId: parseInt(document.getElementById('editTreeGenusId').value, 10),
-    speciesId: parseInt(document.getElementById('editTreeSpeciesId').value, 10)
+    speciesId: parseInt(document.getElementById('editTreeSpeciesId').value, 10),
+    // за да мине същата валидация като при MAUI клиента – навигационни обекти с Id
+    division: { id: parseInt(document.getElementById('editTreeDivisionId').value, 10) },
+    taxonomyClass: { id: parseInt(document.getElementById('editTreeTaxonomyClassId').value, 10) },
+    genus: { id: parseInt(document.getElementById('editTreeGenusId').value, 10) },
+    family: { id: parseInt(document.getElementById('editTreeFamilyId').value, 10) },
+    species: { id: parseInt(document.getElementById('editTreeSpeciesId').value, 10) }
   };
   try {
     await api('api/trees/' + id, { method: 'PUT', body: JSON.stringify(payload) });
     successEl.textContent = 'Дървото е запазено.';
     successEl.hidden = false;
   } catch (err) {
-    errorEl.textContent = err.message || 'Грешка при запазване.';
+    var msg = err && (err.message || (typeof err.data === 'string' ? err.data : '')) || 'Грешка при запазване.';
+    if (err && err.data && typeof err.data === 'object' && !Array.isArray(err.data)) {
+      // ASP.NET Core validation errors (ProblemDetails: errors[field] = [messages...])
+      if (err.data.errors && typeof err.data.errors === 'object') {
+        var parts = [];
+        for (var key in err.data.errors) {
+          if (!Object.prototype.hasOwnProperty.call(err.data.errors, key)) continue;
+          var arr = err.data.errors[key];
+          if (Array.isArray(arr)) {
+            parts = parts.concat(arr.filter(Boolean));
+          }
+        }
+        if (parts.length) msg = parts.join(' ');
+      }
+    } else if (err && Array.isArray(err.data)) {
+      msg = err.data.join(' ');
+    }
+    errorEl.textContent = msg;
     errorEl.hidden = false;
   }
 }

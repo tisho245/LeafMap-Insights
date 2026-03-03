@@ -1,0 +1,28 @@
+{
+  "comment": "Данни от 'Растителни видове в Заимов'. Редактирайте имената според документите Класификация на организмите.docx и отделните .doc файлове.",
+  "species": [
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Rosaceae", "genus": "Rosa", "species": "Rosa canina" },
+    { "division": "Pinophyta", "taxonomyClass": "Pinopsida", "family": "Cupressaceae", "genus": "Sequoia", "species": "Sequoia sempervirens" },
+    { "division": "Pinophyta", "taxonomyClass": "Pinopsida", "family": "Pinaceae", "genus": "Picea", "species": "Picea abies" },
+    { "division": "Pinophyta", "taxonomyClass": "Pinopsida", "family": "Pinaceae", "genus": "Abies", "species": "Abies alba" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Rosaceae", "genus": "Spiraea", "species": "Spiraea salicifolia" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Hydrangeaceae", "genus": "Hydrangea", "species": "Hydrangea macrophylla" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Platanaceae", "genus": "Platanus", "species": "Platanus orientalis" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Ericaceae", "genus": "Vaccinium", "species": "Vaccinium myrtillus" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Fabaceae", "genus": "Robinia", "species": "Robinia pseudoacacia" },
+    { "division": "Pinophyta", "taxonomyClass": "Pinopsida", "family": "Pinaceae", "genus": "Pinus", "species": "Pinus sylvestris" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Betulaceae", "genus": "Betula", "species": "Betula pendula" },
+    { "division": "Pinophyta", "taxonomyClass": "Pinopsida", "family": "Pinaceae", "genus": "Abies", "species": "Abies alba" },
+    { "division": "Pinophyta", "taxonomyClass": "Pinopsida", "family": "Cupressaceae", "genus": "Cupressus", "species": "Cupressus sempervirens" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Sapindaceae", "genus": "Acer", "species": "Acer platanoides" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Sapindaceae", "genus": "Aesculus", "species": "Aesculus hippocastanum" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Malvaceae", "genus": "Tilia", "species": "Tilia platyphyllos" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Oleaceae", "genus": "Fraxinus", "species": "Fraxinus excelsior" },
+    { "division": "Pinophyta", "taxonomyClass": "Pinopsida", "family": "Cupressaceae", "genus": "Juniperus", "species": "Juniperus communis" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Sapindaceae", "genus": "Acer", "species": "Acer pseudoplatanus" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Araliaceae", "genus": "Hedera", "species": "Hedera helix" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Cornaceae", "genus": "Cornus", "species": "Cornus mas" },
+    { "division": "Magnoliophyta", "taxonomyClass": "Magnoliopsida", "family": "Geraniaceae", "genus": "Geranium", "species": "Geranium sanguineum" },
+    { "division": "Pinophyta", "taxonomyClass": "Pinopsida", "family": "Cupressaceae", "genus": "Platycladus", "species": "Platycladus orientalis" }
+  ]
+}

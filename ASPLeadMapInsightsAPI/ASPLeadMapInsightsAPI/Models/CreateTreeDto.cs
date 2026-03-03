@@ -5,6 +5,8 @@ namespace ASPLeadMapInsightsAPI.Models;
 /// </summary>
 public class CreateTreeDto
 {
+    /// <summary>Id се използва само при обновяване (PUT api/trees/{id}). При създаване може да е 0.</summary>
+    public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? PhotoURL { get; set; }
     public string? Description { get; set; }

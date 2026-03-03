@@ -44,20 +44,67 @@ public class TreesController : ControllerBase
         return Ok(list);
     }
 
-    /// <summary>Всички дървета; includeLookups=true зарежда Division, TaxonomyClass, Genus, Family, Species.</summary>
+    /// <summary>
+    /// Всички дървета; includeLookups=true зарежда Division, TaxonomyClass, Genus, Family, Species.
+    /// За оптимизация PhotoURL изобщо не се селектира/връща тук – снимката се взима само при заявка по Id.
+    /// </summary>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Tree>>> GetAll(
         [FromQuery] bool includeLookups = false)
     {
-        var query = _context.Trees.AsQueryable();
+        var baseQuery = _context.Trees.AsQueryable();
+
+        // За списъка нямаме нужда от снимка – проектираме към нови Tree обекти без PhotoURL,
+        // за да не се дърпа голямата колона от базата и да не се праща към клиента.
         if (includeLookups)
-            query = query
-                .Include(t => t.Division)
-                .Include(t => t.TaxonomyClass)
-                .Include(t => t.Genus)
-                .Include(t => t.Family)
-                .Include(t => t.Species);
-        return Ok(await query.OrderBy(t => t.Name).ToListAsync());
+        {
+            var withLookups = await baseQuery
+                .OrderBy(t => t.Name)
+                .Select(t => new Tree
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    PhotoURL = null,
+                    Description = t.Description,
+                    Latitude = t.Latitude,
+                    Longitude = t.Longitude,
+                    DivisionId = t.DivisionId,
+                    TaxonomyClassId = t.TaxonomyClassId,
+                    GenusId = t.GenusId,
+                    FamilyId = t.FamilyId,
+                    SpeciesId = t.SpeciesId,
+                    KlasId = t.KlasId,
+                    Division = t.Division,
+                    TaxonomyClass = t.TaxonomyClass,
+                    Genus = t.Genus,
+                    Family = t.Family,
+                    Species = t.Species
+                })
+                .ToListAsync();
+
+            return Ok(withLookups);
+        }
+
+        var withoutLookups = await baseQuery
+            .OrderBy(t => t.Name)
+            .Select(t => new Tree
+            {
+                Id = t.Id,
+                Name = t.Name,
+                PhotoURL = null,
+                Description = t.Description,
+                Latitude = t.Latitude,
+                Longitude = t.Longitude,
+                DivisionId = t.DivisionId,
+                TaxonomyClassId = t.TaxonomyClassId,
+                GenusId = t.GenusId,
+                FamilyId = t.FamilyId,
+                SpeciesId = t.SpeciesId,
+                KlasId = t.KlasId
+            })
+            .ToListAsync();
+
+        return Ok(withoutLookups);
     }
 
     /// <summary>Пагиниран списък – ?skip=0&amp;take=24. Връща { items: [...], total: N } за по-лесно зареждане без замръзване.</summary>
@@ -122,13 +169,31 @@ public class TreesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = tree.Id }, tree);
     }
 
-    /// <summary>Обновява дърво по Id. Id в URL и в тялото трябва да съвпадат.</summary>
+    /// <summary>
+    /// Обновява дърво по Id. Приема DTO само със скаларни полета (без навигационни свойства),
+    /// за да не се задейства автоматична валидация за Division/Family/Genus/Species навигациите.
+    /// </summary>
     [Authorize]
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, [FromBody] Tree tree)
+    public async Task<IActionResult> Update(int id, [FromBody] CreateTreeDto dto)
     {
-        if (id != tree.Id) return BadRequest();
-        _context.Entry(tree).State = EntityState.Modified;
+        if (id <= 0 || id != dto.Id) return BadRequest("Invalid id.");
+
+        var tree = await _context.Trees.FindAsync(id);
+        if (tree == null) return NotFound();
+
+        tree.Name = dto.Name?.Trim() ?? string.Empty;
+        tree.PhotoURL = dto.PhotoURL;
+        tree.Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim();
+        tree.Latitude = dto.Latitude;
+        tree.Longitude = dto.Longitude;
+        tree.DivisionId = dto.DivisionId;
+        tree.TaxonomyClassId = dto.TaxonomyClassId;
+        tree.GenusId = dto.GenusId;
+        tree.FamilyId = dto.FamilyId;
+        tree.SpeciesId = dto.SpeciesId;
+        tree.KlasId = dto.KlasId;
+
         try
         {
             await _context.SaveChangesAsync();
@@ -138,6 +203,7 @@ public class TreesController : ControllerBase
             if (!await _context.Trees.AnyAsync(e => e.Id == id)) return NotFound();
             throw;
         }
+
         return NoContent();
     }
 
